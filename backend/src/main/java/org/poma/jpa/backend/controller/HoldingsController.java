@@ -1,0 +1,57 @@
+package org.poma.jpa.backend.controller;
+
+import org.poma.jpa.backend.dto.HoldingsRequest;
+import org.poma.jpa.backend.entity.Holdings;
+import org.poma.jpa.backend.service.HoldingsService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/holdings")
+public class HoldingsController {
+
+    private final HoldingsService svc;
+
+    public HoldingsController(HoldingsService svc) {
+        this.svc = svc;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Holdings>> all() {
+        return ResponseEntity.ok(svc.findAll());
+    }
+
+    @GetMapping("/portfolio/{portfolioId}")
+    public ResponseEntity<List<Holdings>> byPortfolio(@PathVariable Long portfolioId) {
+        return ResponseEntity.ok(svc.findByPortfolioId(portfolioId));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Holdings> get(@PathVariable Long id) {
+        return ResponseEntity.ok(svc.findById(id));
+    }
+
+    @PostMapping("/portfolio/{portfolioId}/asset/{assetId}")
+    public ResponseEntity<Holdings> create(@PathVariable Long portfolioId, @PathVariable Long assetId, @RequestBody HoldingsRequest req) {
+        // validation and exceptions are thrown by the service; GlobalExceptionHandler will convert them
+        Holdings saved = svc.create(portfolioId, assetId, req);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(saved.getId()).toUri();
+        return ResponseEntity.created(location).body(saved);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Holdings> update(@PathVariable Long id, @RequestBody HoldingsRequest req) {
+        Holdings updated = svc.update(id, req);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        svc.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}
