@@ -1,28 +1,36 @@
-name: Springboot Jar
+name: Springboot Jar Build
 
 on:
   push:
     branches: ["backend"]
   pull_request:
     branches: ["backend"]
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout Repo
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: set up JDK 17
+
+      # Step 2: Setup Java 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
           cache: maven
-      - name: Build Jar(Skip Tests)
-        run: mvn clean package -DskipTests=true -B
 
+      # Step 3: Build Jar inside backend folder
+      - name: Build Jar (Skip Tests)
+        run: mvn clean package -DskipTests=true -B
+        working-directory: backend
+
+      # Step 4: Upload Jar Artifact
       - name: Upload Jar to Artifact
         uses: actions/upload-artifact@v4
         with:
           name: springboot-app-jar
-          path: target/*.jar
+          path: backend/target/*.jar
