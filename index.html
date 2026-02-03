@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio Manager</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top-header">
+  <h1>Portfolio Manager</h1>
+  <div class="summary">
+    <span>Total Portfolio Value: <strong class="positive">$152,430.25</strong></span>
+    <span>Total Return: <strong class="positive">+12.8%</strong></span>
+    <button class="primary">+ Add Asset</button>
+    <button class="secondary">Remove Asset</button>
+  </div>
+</header>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <button class="nav active">Dashboard</button>
+    <button class="nav">Holdings</button>
+    <button class="nav">Performance</button>
+    <button class="nav">Settings</button>
+  </aside>
+
+  <main class="content">
+
+    <div class="row">
+      <div class="card">
+        <h3>Asset Allocation</h3>
+        <canvas id="allocationChart"></canvas>
+      </div>
+
+      <div class="card wide">
+        <h3>Portfolio vs Benchmark</h3>
+        <canvas id="performanceChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Your Holdings</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Company</th>
+            <th>Shares</th>
+            <th>Price</th>
+            <th>Cost</th>
+            <th>Value</th>
+            <th>P/L</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>AAPL</td><td>Apple</td><td>35</td><td>$145.32</td><td>$120</td><td>$5,086</td><td class="positive">+$886</td>
+          </tr>
+          <tr>
+            <td>TSLA</td><td>Tesla</td><td>20</td><td>$720.15</td><td>$650</td><td>$14,403</td><td class="positive">+$1,402</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Transaction History</h3>
+      <select class="filter">
+        <option>All Assets</option>
+        <option>Stocks</option>
+        <option>Crypto</option>
+        <option>Bonds</option>
+      </select>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th><th>Asset</th><th>Type</th><th>Action</th><th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>2024-01-12</td><td>AAPL</td><td>Stock</td><td>Buy</td><td>$4,200</td></tr>
+          <tr><td>2024-02-05</td><td>BTC</td><td>Crypto</td><td>Sell</td><td>$2,100</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Tax & Fees Tracker</h3>
+      <table>
+        <tr><td>Total Fees</td><td>$1,240</td></tr>
+        <tr><td>Estimated Tax</td><td>$3,820</td></tr>
+        <tr><td>Net Return After Tax</td><td class="positive">$18,450</td></tr>
+      </table>
+    </div>
+
+    <div class="row">
+      <div class="stat">$5,200<span>Cash</span></div>
+      <div class="stat">$110,900<span>Stocks</span></div>
+      <div class="stat">$25,330<span>Bonds</span></div>
+      <div class="stat">$11,000<span>Crypto</span></div>
+    </div>
+
+  </main>
+
+  <aside class="ai-panel">
+    <h3>AI Insights</h3>
+    <div class="ai-card">Tech stocks show volatility ahead of Fed decisions.</div>
+    <div class="ai-card">Portfolio overweight in equities vs benchmark.</div>
+    <div class="ai-card">Consider tax-loss harvesting to reduce capital gains.</div>
+  </aside>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="charts.js"></script>
+</body>
+</html>
