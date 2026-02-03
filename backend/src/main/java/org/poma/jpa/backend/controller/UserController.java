@@ -1,5 +1,6 @@
 package org.poma.jpa.backend.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.poma.jpa.backend.entity.User;
 import org.poma.jpa.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +25,12 @@ public class UserController {
         return ResponseEntity.ok(svc.findAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> get(@PathVariable Long id) {
-        // svc.findById throws ResourceNotFoundException if not found (handled by GlobalExceptionHandler)
-        User user = svc.findById(id);
-        return ResponseEntity.ok(user);
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<User> get(@PathVariable Long id) {
+//        // svc.findById throws ResourceNotFoundException if not found (handled by GlobalExceptionHandler)
+//        User user = svc.findById(id);
+//        return ResponseEntity.ok(user);
+//    }
 
     @PostMapping
     public ResponseEntity<User> create(@RequestBody User user) {
@@ -56,7 +57,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> update(@Parameter(example = "1") @PathVariable Long id, @RequestBody User user) {
         if (user == null) {
             throw new IllegalArgumentException("User must not be null");
         }
@@ -68,10 +69,10 @@ public class UserController {
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        // svc.delete will throw ResourceNotFoundException if id not found
-        svc.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> delete(@PathVariable Long id) {
+//        // svc.delete will throw ResourceNotFoundException if id not found
+//        svc.delete(id);
+//        return ResponseEntity.noContent().build();
+//    }
 }

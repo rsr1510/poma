@@ -29,8 +29,13 @@ public class Assets {
     @Column(name = "type", nullable = false, length = 20)
     private AssetType type;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public Assets() {}
 

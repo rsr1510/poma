@@ -3,6 +3,7 @@ package org.poma.jpa.backend.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -18,7 +19,7 @@ public class UserHistory {
     @JoinColumn(name = "portfolio_id", nullable = false)
     private User portfolioOwner;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "date", nullable = false, updatable = false)
     private LocalDate date;
 
     @Column(name = "total_value", precision = 15, scale = 2, nullable = false)
@@ -28,7 +29,7 @@ public class UserHistory {
 
     public UserHistory(User portfolioOwner, LocalDate date, BigDecimal totalValue) {
         this.portfolioOwner = portfolioOwner;
-        this.date = date;
+        this.date = LocalDate.now();
         this.totalValue = totalValue;
     }
 

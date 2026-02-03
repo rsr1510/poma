@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000/prices"; // Backend URL
+const API_URL = "http://127.0.0.1:8080/prices"; // Backend URL
 const REFRESH_INTERVAL = 15000; // 15 seconds refresh interval
 
 // Function to fetch and update the current price for multiple symbols

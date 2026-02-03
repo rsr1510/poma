@@ -22,8 +22,13 @@ public class User {
     @Column(name = "total_return_pct", precision = 6, scale = 2)
     private BigDecimal totalReturnPct = BigDecimal.ZERO;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public User() {}
 

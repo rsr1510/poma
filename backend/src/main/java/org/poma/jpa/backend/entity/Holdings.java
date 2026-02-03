@@ -39,8 +39,13 @@ public class Holdings {
     @Column(name = "market_value", precision = 15, scale = 2, insertable = false, updatable = false)
     private BigDecimal marketValue;
 
-    @Column(name = "added_at", insertable = false, updatable = false)
+    @Column(name = "added_at", nullable = false, updatable = false)
     private LocalDateTime addedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.addedAt = LocalDateTime.now();
+    }
 
     public Holdings() {}
 
