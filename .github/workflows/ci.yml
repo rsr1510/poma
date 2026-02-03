@@ -2,9 +2,9 @@ name: Springboot Jar
 
 on:
   push:
-    branches: ["main"]
+    branches: ["backend"]
   pull_request:
-    branches: ["main"]
+    branches: ["backend"]
 jobs:
   build:
     runs-on: ubuntu-latest
