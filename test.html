@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Stock Price</title>
+</head>
+<body>
+
+  <h1>Live Stock Price</h1>
+  <div id="stock-price">Loading...</div>
+
+  <script>
+    // You can replace this URL with your actual API endpoint
+    const apiUrl = 'https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=TSLA'; // Example for Apple stock (AAPL)
+
+    // Function to fetch stock price
+    function fetchStockPrice() {
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          // Example: Get stock price for AAPL
+          const stockPrice = data.quoteResponse.result[0].regularMarketPrice;
+          document.getElementById('stock-price').textContent = `AAPL: $${stockPrice}`;
+        })
+        .catch(error => console.error('Error fetching stock data:', error));
+    }
+
+    // Initial fetch on page load
+    fetchStockPrice();
+
+    // Optionally, refresh the stock price every 30 seconds (adjust as needed)
+    setInterval(fetchStockPrice, 30000); // Refresh every 30 seconds (30000 milliseconds)
+  </script>
+
+</body>
+</html>
