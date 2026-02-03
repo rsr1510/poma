@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio Manager</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top-header">
+  <h1>Portfolio Manager</h1>
+  <div class="summary">
+    <span>Total Portfolio Value: <strong class="positive">₹12,52,430</strong></span>
+    <span>Total Return: <strong class="positive">+12.8%</strong></span>
+    <button class="primary">+ Add Asset</button>
+    <button class="secondary">Remove Asset</button>
+  </div>
+</header>
+
+<div class="app">
+  <aside class="sidebar">
+    <button class="nav active">Dashboard</button>
+    <button class="nav">Holdings</button>
+    <button class="nav">Performance</button>
+    <button class="nav">Settings</button>
+  </aside>
+
+  <main class="content">
+    <div class="row">
+      <div class="card">
+        <h3>Asset Allocation</h3>
+        <canvas id="allocationChart"></canvas>
+      </div>
+
+      <div class="card wide">
+        <h3>Portfolio vs Benchmark</h3>
+        <canvas id="performanceChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Your Holdings</h3>
+      <table id="holdingsTable">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Asset</th>
+            <th>Units</th>
+            <th>Buy Price (₹)</th>
+            <th>Current Price (₹)</th>
+            <th>Market Value (₹)</th>
+            <th>P/L (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-symbol="TCS.NS">
+            <td>TCS</td>
+            <td>Stock</td>
+            <td>1</td>
+            <td>3200</td>
+            <td class="current-price">Loading...</td>
+            <td class="market-value">Loading...</td>
+            <td class="pl">Loading...</td>
+          </tr>
+          <tr data-symbol="INFY.NS">
+            <td>INFY</td>
+            <td>Stock</td>
+            <td>1</td>
+            <td>1400</td>
+            <td class="current-price">Loading...</td>
+            <td class="market-value">Loading...</td>
+            <td class="pl">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Tax & Fees Tracker</h3>
+      <table>
+        <tr>
+          <td>Total Invested Amount</td>
+          <td>₹2,20,000</td>
+        </tr>
+        <tr>
+          <td>Total Profit Earned</td>
+          <td class="positive">₹26,900</td>
+        </tr>
+        <tr>
+          <td>Brokerage & Platform Fees</td>
+          <td>₹1,450</td>
+        </tr>
+        <tr>
+          <td>Estimated Capital Gains Tax (15%)</td>
+          <td>₹4,035</td>
+        </tr>
+        <tr>
+          <td><strong>Net Profit After Fees & Tax</strong></td>
+          <td class="positive"><strong>₹21,415</strong></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="row">
+      <div class="stat">₹95,000<span>Stocks</span></div>
+      <div class="stat">₹18,500<span>Mutual Funds</span></div>
+      <div class="stat">₹12,300<span>Crypto</span></div>
+      <div class="stat">₹6,200<span>Cash</span></div>
+    </div>
+  </main>
+
+  <aside class="ai-panel">
+    <h3>AI Insights</h3>
+    <div class="ai-card">Your equity exposure is high; consider partial profit booking to reduce tax impact.</div>
+    <div class="ai-card">TCS has outperformed its sector benchmark by 6.2% this quarter.</div>
+    <div class="ai-card">High short-term gains detected — holding longer could reduce capital gains tax.</div>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
