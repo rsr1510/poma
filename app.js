@@ -2,6 +2,45 @@ const API_URL = "http://127.0.0.1:8000/prices";
 const HOLDINGS_API = "http://127.0.0.1:8080/api/holdings";
 const REFRESH_INTERVAL = 15000;
 
+let topStocks = [
+  { "name": "Reliance Industries", "symbol": "RELIANCE.NS" },
+  { "name": "Tata Consultancy Services", "symbol": "TCS.NS" },
+  { "name": "Infosys", "symbol": "INFY.NS" },
+  { "name": "HDFC Bank", "symbol": "HDFCBANK.NS" },
+  { "name": "ICICI Bank", "symbol": "ICICIBANK.NS" },
+  { "name": "Bharti Airtel", "symbol": "BHARTIARTL.NS" },
+  { "name": "State Bank of India", "symbol": "SBIN.NS" },
+  { "name": "Kotak Mahindra Bank", "symbol": "KOTAKBANK.NS" },
+  { "name": "Axis Bank", "symbol": "AXISBANK.NS" },
+  { "name": "Larsen & Toubro", "symbol": "LT.NS" },
+  { "name": "ITC", "symbol": "ITC.NS" },
+  { "name": "Hindustan Unilever", "symbol": "HINDUNILVR.NS" },
+  { "name": "Tata Steel", "symbol": "TATASTEEL.NS" },
+  { "name": "NTPC", "symbol": "NTPC.NS" },
+  { "name": "Power Grid Corporation", "symbol": "POWERGRID.NS" },
+  { "name": "Coal India", "symbol": "COALINDIA.NS" },
+  { "name": "Oil and Natural Gas Corporation", "symbol": "ONGC.NS" },
+  { "name": "GAIL (India)", "symbol": "GAIL.NS" },
+  { "name": "Bharat Petroleum Corporation", "symbol": "BPCL.NS" },
+  { "name": "Hindustan Petroleum Corporation", "symbol": "HINDPETRO.NS" },
+  { "name": "Tata Motors", "symbol": "TATAMOTORS.NS" },
+  { "name": "Mahindra & Mahindra", "symbol": "M&M.NS" },
+  { "name": "Maruti Suzuki India", "symbol": "MARUTI.NS" },
+  { "name": "Bajaj Auto", "symbol": "BAJAJ-AUTO.NS" },
+  { "name": "Hero MotoCorp", "symbol": "HEROMOTOCO.NS" },
+  { "name": "Eicher Motors", "symbol": "EICHERMOT.NS" },
+  { "name": "UltraTech Cement", "symbol": "ULTRACEMCO.NS" },
+  { "name": "Shree Cement", "symbol": "SHREECEM.NS" },
+  { "name": "Grasim Industries", "symbol": "GRASIM.NS" },
+  { "name": "Ambuja Cements", "symbol": "AMBUJACEM.NS" },
+  { "name": "JSW Steel", "symbol": "JSWSTEEL.NS" },
+  { "name": "Tata Power", "symbol": "TATAPOWER.NS" },
+  { "name": "Adani Ports and Special Economic Zone", "symbol": "ADANIPORTS.NS" },
+  { "name": "Adani Enterprises", "symbol": "ADANIENT.NS" }
+];
+let topStocksLoaded = true;
+
+
 const feesData = {
   stocks: [
     {
@@ -457,11 +496,7 @@ function updateAssetOptions() {
   }
 
   if (type === "stock") {
-    category.innerHTML = `
-      <option>Large Cap</option>
-      <option>Mid Cap</option>
-      <option>Small Cap</option>
-    `;
+    category.innerHTML = topStocks.map(stock => `<option value="${stock.symbol}">${stock.name}</option>`).join('');
     platform.innerHTML = `
       <option value="zerodha">Zerodha</option>
       <option value="groww">Groww</option>
