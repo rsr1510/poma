@@ -7,13 +7,35 @@
   </head>
   <body>
     <header class="top-header">
-      <h1>Portfolio Manager</h1>
+      <h1>PoMa</h1>
+      <div class="row">
+        <div class="stat" id="bestAsset">
+          <span>Best Performer</span>
+          <div class="value">Loading...</div>
+        </div>
+
+        <div class="stat" id="worstAsset">
+          <span>Worst Performer</span>
+          <div class="value">Loading...</div>
+        </div>
+
+        <div class="stat" id="dailyChange">
+          <span>Daily Change</span>
+          <div class="value">Loading...</div>
+        </div>
+      </div>
+
       <div class="summary">
-        <span
-          >Total Portfolio Value:
-          <strong class="positive">₹12,52,430</strong></span
-        >
-        <span>Total Return: <strong class="positive">+12.8%</strong></span>
+        <span>
+          Total Portfolio Value:
+          <strong id="portfolioValue" class="positive">Loading...</strong>
+        </span>
+
+        <span>
+          Total Return:
+          <strong id="portfolioReturn" class="positive">Loading...</strong>
+        </span>
+
         <button class="primary">+ Add Asset</button>
         <button class="secondary">Remove Asset</button>
       </div>
@@ -38,6 +60,13 @@
             <h3>Portfolio vs Benchmark</h3>
             <canvas id="performanceChart"></canvas>
           </div>
+        </div>
+
+        <div class="row">
+          <div class="stat" id="stocksStat">Loading...<span>Stocks</span></div>
+          <div class="stat" id="bondsStat">Loading...<span>Bonds</span></div>
+          <div class="stat" id="cryptoStat">Loading...<span>Crypto</span></div>
+          <div class="stat" id="cashStat">Loading...<span>Cash</span></div>
         </div>
 
         <div class="card">
@@ -82,13 +111,6 @@
               <td class="positive"><strong>₹21,415</strong></td>
             </tr>
           </table>
-        </div>
-
-        <div class="row">
-          <div class="stat" id="stocksStat">Loading...<span>Stocks</span></div>
-          <div class="stat" id="bondsStat">Loading...<span>Bonds</span></div>
-          <div class="stat" id="cryptoStat">Loading...<span>Crypto</span></div>
-          <div class="stat" id="cashStat">Loading...<span>Cash</span></div>
         </div>
       </main>
 
