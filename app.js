@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8080/prices";
+const API_URL = "http://127.0.0.1:8000/prices";
 const HOLDINGS_API = "http://127.0.0.1:8080/api/holdings";
 const REFRESH_INTERVAL = 15000;
 
