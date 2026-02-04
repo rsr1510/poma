@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8080/prices";
+const API_URL = "http://127.0.0.1:8000/prices";
 const HOLDINGS_API = "http://127.0.0.1:8080/api/holdings";
 const REFRESH_INTERVAL = 15000;
 
@@ -236,3 +236,38 @@ window.addEventListener("load", () => {
 });
 
 setInterval(updatePrices, REFRESH_INTERVAL);
+function openAssetModal() {
+  document.getElementById("assetModal").style.display = "flex";
+}
+
+function closeAssetModal() {
+  document.getElementById("assetModal").style.display = "none";
+}
+
+function updateAssetOptions() {
+  const type = document.getElementById("assetType").value;
+  const category = document.getElementById("assetCategory");
+
+  category.innerHTML = "";
+
+  if (type === "cash") {
+    category.innerHTML = `<option>INR Cash</option>`;
+  }
+
+  if (type === "stock") {
+    category.innerHTML = `
+      <option>Large Cap</option>
+      <option>Mid Cap</option>
+      <option>Small Cap</option>
+    `;
+  }
+
+  if (type === "crypto") {
+    category.innerHTML = `
+      <option>Bitcoin</option>
+      <option>Ethereum</option>
+      <option>Altcoin</option>
+    `;
+  }
+}
+

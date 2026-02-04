@@ -5,6 +5,50 @@
     <title>Portfolio Manager</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
+    <!-- ADD ASSET POPUP -->
+  <div id="assetModal" class="modal">
+    <div class="modal-content">
+
+      <h3>Add Asset</h3>
+
+      <!-- Asset Type -->
+      <label>Asset Type</label>
+      <select id="assetType" onchange="updateAssetOptions()">
+        <option value="">Select asset type</option>
+        <option value="stock">Stock</option>
+        <option value="crypto">Crypto</option>
+        <option value="cash">Cash</option>
+      </select>
+
+      <!-- Dynamic second dropdown -->
+      <label>Asset Category</label>
+      <select id="assetCategory">
+        <option value="">Select asset type first</option>
+      </select>
+
+      <!-- Asset Name -->
+      <label>Asset Name / Symbol</label>
+      <input id="assetName" placeholder="e.g. TCS, BTC, INR">
+
+      <!-- Platform -->
+      <label>Platform</label>
+      <select id="platform">
+        <option value="groww">Groww (0.5% fee)</option>
+        <option value="zerodha">Zerodha (0.3% fee)</option>
+      </select>
+
+      <!-- Units -->
+      <label>Units</label>
+      <input id="units" type="number" placeholder="Enter units">
+
+      <div class="modal-actions">
+        <button class="secondary" onclick="closeAssetModal()">Cancel</button>
+        <button class="primary">Save</button>
+      </div>
+
+    </div>
+  </div>
+
   <body>
     <header class="top-header">
       <h1>PoMa</h1>
@@ -21,7 +65,7 @@
           <strong id="portfolioReturn" class="positive">Loading...</strong>
         </span>
 
-        <button class="primary">+ Add Asset</button>
+        <button class="primary" onclick="openAssetModal()">+ Add Asset</button>
         <button class="secondary">Remove Asset</button>
       </div>
     </header>
