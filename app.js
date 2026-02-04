@@ -40,6 +40,30 @@ let topStocks = [
 ];
 let topStocksLoaded = true;
 
+let topCryptos = [
+  { "name": "XRP USD", "symbol": "XRP-USD" },
+  { "name": "USD Coin USD", "symbol": "USDC-USD" },
+  { "name": "Solana USD", "symbol": "SOL-USD" },
+  { "name": "TRON USD", "symbol": "TRX-USD" },
+  { "name": "Wrapped TRON USD", "symbol": "WTRX-USD" },
+  { "name": "Lido Staked ETH USD", "symbol": "STETH-USD" },
+  { "name": "Dogecoin USD", "symbol": "DOGE-USD" },
+  { "name": "Cardano USD", "symbol": "ADA-USD" },
+  { "name": "Bitcoin Cash USD", "symbol": "BCH-USD" },
+  { "name": "Lido wstETH USD", "symbol": "WSTETH-USD" },
+  { "name": "Hyperliquid USD", "symbol": "HYPE32196-USD" },
+  { "name": "USDS USD", "symbol": "USDS33039-USD" }
+];
+
+let topBonds = [
+  { "name": "13 WEEK TREASURY BILL", "symbol": "^IRX" },
+  { "name": "Treasury Yield 5 Years", "symbol": "^FVX" },
+  { "name": "CBOE Interest Rate 10 Year T No", "symbol": "^TNX" },
+  { "name": "Treasury Yield 30 Years", "symbol": "^TYX" },
+  { "name": "2-Year T-Note Futures", "symbol": "2YY=F" },
+  { "name": "10-Year T-Note Futures", "symbol": "ZN=F" }
+];
+
 
 const feesData = {
   stocks: [
@@ -118,7 +142,7 @@ const feesData = {
     },
     {
       platform: "WazirX",
-      allInPercent: 1.50,
+      allInPercent: 0.20,
       breakdown: [
         "Trading fee",
         "GST (18%)",
@@ -451,6 +475,7 @@ function updateFees() {
   if (assetType === "stock") assetKey = "stocks";
   if (assetType === "cash") {
     currentFeePercent = 0;
+    document.getElementById("platformFeeDetails").innerHTML = "No fees for cash";
     updateBill();
     return;
   }
@@ -460,11 +485,17 @@ function updateFees() {
     const platformData = data.find(p => p.platform.toLowerCase() === platform);
     if (platformData) {
       currentFeePercent = platformData.allInPercent;
+      document.getElementById("platformFeeDetails").innerHTML = `
+        <div class="fee-percent">~${platformData.allInPercent}%</div>
+        <div class="fee-breakdown">${platformData.breakdown.map(b => `• ${b}`).join("<br>")}</div>
+      `;
     } else {
       currentFeePercent = 0;
+      document.getElementById("platformFeeDetails").innerHTML = "No fees data available for this platform";
     }
   } else {
     currentFeePercent = 0;
+    document.getElementById("platformFeeDetails").innerHTML = "Select an asset type and platform";
   }
   updateBill();
 }
@@ -505,15 +536,20 @@ function updateAssetOptions() {
   }
 
   if (type === "crypto") {
-    category.innerHTML = `
-      <option>Bitcoin</option>
-      <option>Ethereum</option>
-      <option>Altcoin</option>
-    `;
+    category.innerHTML = topCryptos.map(crypto => `<option value="${crypto.symbol}">${crypto.name}</option>`).join('');
     platform.innerHTML = `
       <option value="coinswitch">CoinSwitch</option>
       <option value="wazirx">WazirX</option>
       <option value="zebpay">ZebPay</option>
+    `;
+  }
+
+  if (type === "bonds") {
+    category.innerHTML = topBonds.map(bond => `<option value="${bond.symbol}">${bond.name}</option>`).join('');
+    platform.innerHTML = `
+      <option value="zerodha">Zerodha</option>
+      <option value="groww">Groww</option>
+      <option value="5paisa">5paisa</option>
     `;
   }
 
