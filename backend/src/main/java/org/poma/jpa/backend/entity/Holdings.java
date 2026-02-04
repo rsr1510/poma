@@ -44,6 +44,9 @@ public class Holdings {
     @Column(name = "added_at", nullable = false, updatable = false)
     private LocalDateTime addedAt;
 
+    public Holdings(Assets asset, BigDecimal zero) {
+    }
+
     @PrePersist
     protected void onCreate() {
         this.addedAt = LocalDateTime.now();

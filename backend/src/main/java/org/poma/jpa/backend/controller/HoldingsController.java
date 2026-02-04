@@ -1,8 +1,11 @@
 package org.poma.jpa.backend.controller;
 
 import org.poma.jpa.backend.dto.HoldingsRequest;
+import org.poma.jpa.backend.dto.SellRequest;
 import org.poma.jpa.backend.entity.Holdings;
+import org.poma.jpa.backend.entity.Transactions;
 import org.poma.jpa.backend.service.HoldingsService;
+import org.poma.jpa.backend.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,9 +20,11 @@ import java.util.Map;
 public class HoldingsController {
 
     private final HoldingsService svc;
+    private final TransactionService transactionService;
 
-    public HoldingsController(HoldingsService svc) {
+    public HoldingsController(HoldingsService svc, TransactionService transactionService) {
         this.svc = svc;
+        this.transactionService = transactionService;
     }
 
     @GetMapping
@@ -45,10 +50,15 @@ public class HoldingsController {
 
     @PostMapping("/portfolio/{portfolioId}/asset/{assetId}")
     public ResponseEntity<Holdings> create(@PathVariable Long portfolioId, @PathVariable Long assetId, @RequestBody HoldingsRequest req) {
-        // validation and exceptions are thrown by the service; GlobalExceptionHandler will convert them
         Holdings saved = svc.create(portfolioId, assetId, req);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(saved.getId()).toUri();
         return ResponseEntity.created(location).body(saved);
+    }
+
+    @PostMapping("/sell")
+    public ResponseEntity<Transactions> sell(@RequestBody SellRequest req) {
+        Transactions transaction = transactionService.sell(req);
+        return ResponseEntity.ok(transaction);
     }
 
 //    @PutMapping("/{id}")

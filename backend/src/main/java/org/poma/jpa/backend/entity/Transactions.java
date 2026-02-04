@@ -1,9 +1,6 @@
 package org.poma.jpa.backend.entity;
 
 import jakarta.persistence.*;
-import org.poma.jpa.backend.entity.Assets;
-import org.poma.jpa.backend.entity.User;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -14,6 +11,11 @@ public class Transactions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    // ✅ Link Asset Table
+    @ManyToOne
+    @JoinColumn(name="asset_id", nullable=false)
+    private Assets asset;
 
     private String platform;
 
@@ -27,6 +29,14 @@ public class Transactions {
     @Column(name="total_cost")
     private BigDecimal totalCost;
 
+    // ✅ Filled only when sold
+    @Column(name="market_value")
+    private BigDecimal marketValue;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="transaction_type")
+    private TransactionType transactionType;
+
     @Column(name="transaction_date")
     private LocalDateTime transactionDate;
 
@@ -35,24 +45,18 @@ public class Transactions {
         transactionDate = LocalDateTime.now();
     }
 
-    public Transactions() {}
-
-    public Transactions(Long id, String platform, BigDecimal quantity, BigDecimal pricePerUnit, BigDecimal fees, BigDecimal totalCost, LocalDateTime transactionDate) {
-        this.id = id;
-        this.platform = platform;
-        this.quantity = quantity;
-        this.pricePerUnit = pricePerUnit;
-        this.fees = fees;
-        this.totalCost = totalCost;
-        this.transactionDate = transactionDate;
-    }
+    // ================= Getters + Setters =================
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Assets getAsset() {
+        return asset;
+    }
+
+    public void setAsset(Assets asset) {
+        this.asset = asset;
     }
 
     public String getPlatform() {
@@ -95,13 +99,23 @@ public class Transactions {
         this.totalCost = totalCost;
     }
 
+    public BigDecimal getMarketValue() {
+        return marketValue;
+    }
+
+    public void setMarketValue(BigDecimal marketValue) {
+        this.marketValue = marketValue;
+    }
+
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
+
     public LocalDateTime getTransactionDate() {
         return transactionDate;
     }
-
-    public void setTransactionDate(LocalDateTime transactionDate) {
-        this.transactionDate = transactionDate;
-    }
-
-    // getters/setters
 }
