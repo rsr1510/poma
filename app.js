@@ -2,6 +2,102 @@ const API_URL = "http://127.0.0.1:8000/prices";
 const HOLDINGS_API = "http://127.0.0.1:8080/api/holdings";
 const REFRESH_INTERVAL = 15000;
 
+const feesData = {
+  stocks: [
+    {
+      platform: "Zerodha",
+      allInPercent: 0.35,
+      breakdown: [
+        "₹0 brokerage",
+        "STT (0.1%)",
+        "Exchange & SEBI charges",
+        "GST on charges",
+        "Stamp duty"
+      ]
+    },
+    {
+      platform: "Groww",
+      allInPercent: 0.35,
+      breakdown: [
+        "₹0 brokerage",
+        "STT (0.1%)",
+        "Exchange & SEBI charges",
+        "GST on charges",
+        "Stamp duty"
+      ]
+    },
+    {
+      platform: "Upstox",
+      allInPercent: 0.40,
+      breakdown: [
+        "Brokerage (₹20 or %)",
+        "STT (0.1%)",
+        "Exchange & SEBI charges",
+        "GST on charges",
+        "Stamp duty"
+      ]
+    }
+  ],
+
+  bonds: [
+    {
+      platform: "Zerodha",
+      allInPercent: 0.10,
+      breakdown: [
+        "Platform fee",
+        "GST (18%)"
+      ]
+    },
+    {
+      platform: "Groww",
+      allInPercent: 0.10,
+      breakdown: [
+        "Platform fee",
+        "GST (18%)"
+      ]
+    },
+    {
+      platform: "5paisa",
+      allInPercent: 0.08,
+      breakdown: [
+        "Flat brokerage",
+        "Exchange charges",
+        "GST (18%)"
+      ]
+    }
+  ],
+
+  crypto: [
+    {
+      platform: "CoinSwitch",
+      allInPercent: 1.50,
+      breakdown: [
+        "Trading fee",
+        "GST (18%)",
+        "1% TDS"
+      ]
+    },
+    {
+      platform: "WazirX",
+      allInPercent: 1.50,
+      breakdown: [
+        "Trading fee",
+        "GST (18%)",
+        "1% TDS"
+      ]
+    },
+    {
+      platform: "ZebPay",
+      allInPercent: 1.80,
+      breakdown: [
+        "Trading fee",
+        "GST (18%)",
+        "1% TDS"
+      ]
+    }
+  ]
+};
+
 /* ============================= */
 /* Utility: Format INR Currency */
 /* ============================= */
@@ -270,4 +366,123 @@ function updateAssetOptions() {
     `;
   }
 }
+
+const tabs = document.querySelectorAll(".asset-tab");
+const feesGrid = document.getElementById("feesGrid");
+
+function renderFees(asset) {
+  feesGrid.innerHTML = "";
+
+  feesData[asset].forEach(item => {
+    feesGrid.innerHTML += `
+      <div class="fee-card">
+        <h4>${item.platform}</h4>
+        <span>${asset.toUpperCase()}</span>
+
+        <div class="fee-percent">
+          ~${item.allInPercent}%
+        </div>
+
+        <div class="fee-breakdown">
+          ${item.breakdown.map(b => `• ${b}`).join("<br>")}
+        </div>
+      </div>
+    `;
+  });
+}
+
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    renderFees(tab.dataset.asset);
+  });
+});
+
+// initial load
+renderFees("stocks");
+
+let currentFeePercent = 0;
+
+function updateFees() {
+  const assetType = document.getElementById("assetType").value;
+  const platform = document.getElementById("platform").value;
+
+  let assetKey = assetType;
+  if (assetType === "stock") assetKey = "stocks";
+  if (assetType === "cash") {
+    currentFeePercent = 0;
+    updateBill();
+    return;
+  }
+
+  const data = feesData[assetKey];
+  if (data) {
+    const platformData = data.find(p => p.platform.toLowerCase() === platform);
+    if (platformData) {
+      currentFeePercent = platformData.allInPercent;
+    } else {
+      currentFeePercent = 0;
+    }
+  } else {
+    currentFeePercent = 0;
+  }
+  updateBill();
+}
+
+function updateBill() {
+  const units = parseFloat(document.getElementById("units").value) || 0;
+  const pricePerUnit = parseFloat(document.getElementById("pricePerUnit").value) || 0;
+
+  const totalInvestment = units * pricePerUnit;
+  const fees = totalInvestment * (currentFeePercent / 100);
+  const totalCost = totalInvestment + fees;
+
+  document.getElementById("totalInvestment").innerText = formatINR(totalInvestment);
+  document.getElementById("fees").innerText = formatINR(fees);
+  document.getElementById("totalCost").innerText = formatINR(totalCost);
+}
+
+function updateAssetOptions() {
+  const type = document.getElementById("assetType").value;
+  const category = document.getElementById("assetCategory");
+  const platform = document.getElementById("platform");
+
+  category.innerHTML = "";
+  platform.innerHTML = "";
+
+  if (type === "cash") {
+    category.innerHTML = `<option>INR Cash</option>`;
+    platform.innerHTML = `<option value="none">No Platform</option>`;
+  }
+
+  if (type === "stock") {
+    category.innerHTML = `
+      <option>Large Cap</option>
+      <option>Mid Cap</option>
+      <option>Small Cap</option>
+    `;
+    platform.innerHTML = `
+      <option value="zerodha">Zerodha</option>
+      <option value="groww">Groww</option>
+      <option value="upstox">Upstox</option>
+    `;
+  }
+
+  if (type === "crypto") {
+    category.innerHTML = `
+      <option>Bitcoin</option>
+      <option>Ethereum</option>
+      <option>Altcoin</option>
+    `;
+    platform.innerHTML = `
+      <option value="coinswitch">CoinSwitch</option>
+      <option value="wazirx">WazirX</option>
+      <option value="zebpay">ZebPay</option>
+    `;
+  }
+
+  updateFees();
+}
+
 

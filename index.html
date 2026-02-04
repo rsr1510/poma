@@ -17,6 +17,7 @@
         <option value="">Select asset type</option>
         <option value="stock">Stock</option>
         <option value="crypto">Crypto</option>
+        <option value="bonds">Bonds</option>
         <option value="cash">Cash</option>
       </select>
 
@@ -26,20 +27,34 @@
         <option value="">Select asset type first</option>
       </select>
 
-      <!-- Asset Name -->
-      <label>Asset Name / Symbol</label>
-      <input id="assetName" placeholder="e.g. TCS, BTC, INR">
-
       <!-- Platform -->
       <label>Platform</label>
-      <select id="platform">
-        <option value="groww">Groww (0.5% fee)</option>
-        <option value="zerodha">Zerodha (0.3% fee)</option>
-      </select>
+      <select id="platform" onchange="updateFees()"></select>
 
       <!-- Units -->
       <label>Units</label>
-      <input id="units" type="number" placeholder="Enter units">
+      <input id="units" type="number" placeholder="Enter units" oninput="updateBill()">
+
+      <!-- Price per Unit -->
+      <label>Price per Unit (₹)</label>
+      <input id="pricePerUnit" type="number" placeholder="Enter price per unit" oninput="updateBill()">
+
+      <!-- Transaction Summary -->
+      <div class="bill">
+        <h4>Transaction Summary</h4>
+        <div class="bill-row">
+          <span>Total Investment:</span>
+          <span id="totalInvestment">₹0</span>
+        </div>
+        <div class="bill-row">
+          <span>Fees:</span>
+          <span id="fees">₹0</span>
+        </div>
+        <div class="bill-row total">
+          <span>Total Cost:</span>
+          <span id="totalCost">₹0</span>
+        </div>
+      </div>
 
       <div class="modal-actions">
         <button class="secondary" onclick="closeAssetModal()">Cancel</button>
@@ -112,6 +127,22 @@
           <div class="stat" id="bondsStat">Loading...<span>Bonds</span></div>
           <div class="stat" id="cryptoStat">Loading...<span>Crypto</span></div>
           <div class="stat" id="cashStat">Loading...<span>Cash</span></div>
+        </div>
+        
+        <div class="card fees-section">
+          <h3>Platform Fees (All-in)</h3>
+
+          <div class="asset-tabs">
+            <div class="asset-tab active" data-asset="stocks">Stocks</div>
+            <div class="asset-tab" data-asset="bonds">Bonds</div>
+            <div class="asset-tab" data-asset="crypto">Crypto</div>
+          </div>
+
+          <div class="fees-grid" id="feesGrid"></div>
+
+          <div class="fee-note" style="margin-top:12px">
+            Indicative all-in cost per transaction. Capital gains tax not included.
+          </div>
         </div>
 
         <div class="card">
