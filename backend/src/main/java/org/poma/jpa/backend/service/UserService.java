@@ -41,8 +41,8 @@ public class UserService {
         return repo.save(existing);
     }
 
-    public void delete(Long id) {
-        User existing = findById(id);
-        repo.delete(existing);
-    }
+//    public void delete(Long id) {
+//        User existing = findById(id);
+//        repo.delete(existing);
+//    }
 }

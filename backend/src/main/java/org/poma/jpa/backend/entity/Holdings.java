@@ -1,5 +1,6 @@
 package org.poma.jpa.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,7 +23,8 @@ public class Holdings {
     @JoinColumn(name = "portfolio_id", nullable = false)
     private User portfolioOwner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_id", nullable = false)
     private Assets asset;
 

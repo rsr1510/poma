@@ -25,15 +25,15 @@ public class HoldingsController {
         return ResponseEntity.ok(svc.findAll());
     }
 
-    @GetMapping("/portfolio/{portfolioId}")
-    public ResponseEntity<List<Holdings>> byPortfolio(@PathVariable Long portfolioId) {
-        return ResponseEntity.ok(svc.findByPortfolioId(portfolioId));
-    }
+//    @GetMapping("/portfolio/{portfolioId}")
+//    public ResponseEntity<List<Holdings>> byPortfolio(@PathVariable Long portfolioId) {
+//        return ResponseEntity.ok(svc.findByPortfolioId(portfolioId));
+//    }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Holdings> get(@PathVariable Long id) {
-        return ResponseEntity.ok(svc.findById(id));
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Holdings> get(@PathVariable Long id) {
+//        return ResponseEntity.ok(svc.findById(id));
+//    }
 
     @PostMapping("/portfolio/{portfolioId}/asset/{assetId}")
     public ResponseEntity<Holdings> create(@PathVariable Long portfolioId, @PathVariable Long assetId, @RequestBody HoldingsRequest req) {
@@ -43,15 +43,16 @@ public class HoldingsController {
         return ResponseEntity.created(location).body(saved);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Holdings> update(@PathVariable Long id, @RequestBody HoldingsRequest req) {
-        Holdings updated = svc.update(id, req);
-        return ResponseEntity.ok(updated);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Holdings> update(@PathVariable Long id, @RequestBody HoldingsRequest req) {
+//        Holdings updated = svc.update(id, req);
+//        return ResponseEntity.ok(updated);
+//    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        svc.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> delete(@PathVariable Long id) {
+//        svc.delete(id);
+//        return ResponseEntity.noContent().build();
+//    }
 }
+

@@ -36,10 +36,10 @@ public class HoldingsService {
         return holdingsRepo.findByPortfolioOwnerId(portfolioId);
     }
 
-    public Holdings findById(Long id) {
-        return holdingsRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Holding not found with id: " + id));
-    }
+//    public Holdings findById(Long id) {
+//        return holdingsRepo.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Holding not found with id: " + id));
+//    }
 
     // New DTO-based create method
     public Holdings create(Long portfolioId, Long assetId, HoldingsRequest req) {
@@ -84,28 +84,28 @@ public class HoldingsService {
         return holdingsRepo.save(h);
     }
 
-    // New DTO-based update method
-    public Holdings update(Long id, HoldingsRequest req) {
-        if (req == null) throw new IllegalArgumentException("Holding must not be null");
-        Holdings existing = findById(id);
-        if (req.getQuantity() != null) existing.setQuantity(req.getQuantity());
-        if (req.getAvgBuyPrice() != null) existing.setAvgBuyPrice(req.getAvgBuyPrice());
-        if (req.getCurrentPrice() != null) existing.setCurrentPrice(req.getCurrentPrice());
-        return holdingsRepo.save(existing);
-    }
+//    // New DTO-based update method
+//    public Holdings update(Long id, HoldingsRequest req) {
+//        if (req == null) throw new IllegalArgumentException("Holding must not be null");
+//        Holdings existing = findById(id);
+//        if (req.getQuantity() != null) existing.setQuantity(req.getQuantity());
+//        if (req.getAvgBuyPrice() != null) existing.setAvgBuyPrice(req.getAvgBuyPrice());
+//        if (req.getCurrentPrice() != null) existing.setCurrentPrice(req.getCurrentPrice());
+//        return holdingsRepo.save(existing);
+//    }
+//
+//    // Keep original update for compatibility
+//    public Holdings update(Long id, Holdings incoming) {
+//        if (incoming == null) throw new IllegalArgumentException("Holding must not be null");
+//        Holdings existing = findById(id);
+//        if (incoming.getQuantity() != null) existing.setQuantity(incoming.getQuantity());
+//        if (incoming.getAvgBuyPrice() != null) existing.setAvgBuyPrice(incoming.getAvgBuyPrice());
+//        if (incoming.getCurrentPrice() != null) existing.setCurrentPrice(incoming.getCurrentPrice());
+//        return holdingsRepo.save(existing);
+//    }
 
-    // Keep original update for compatibility
-    public Holdings update(Long id, Holdings incoming) {
-        if (incoming == null) throw new IllegalArgumentException("Holding must not be null");
-        Holdings existing = findById(id);
-        if (incoming.getQuantity() != null) existing.setQuantity(incoming.getQuantity());
-        if (incoming.getAvgBuyPrice() != null) existing.setAvgBuyPrice(incoming.getAvgBuyPrice());
-        if (incoming.getCurrentPrice() != null) existing.setCurrentPrice(incoming.getCurrentPrice());
-        return holdingsRepo.save(existing);
-    }
-
-    public void delete(Long id) {
-        Holdings existing = findById(id);
-        holdingsRepo.delete(existing);
-    }
+//    public void delete(Long id) {
+//        Holdings existing = findById(id);
+//        holdingsRepo.delete(existing);
+//    }
 }
