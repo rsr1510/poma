@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/holdings")
@@ -24,6 +26,12 @@ public class HoldingsController {
     public ResponseEntity<List<Holdings>> all() {
         return ResponseEntity.ok(svc.findAll());
     }
+
+//    @GetMapping("/summary")
+//    public ResponseEntity<Map<String, BigDecimal>> summary() {
+//        return ResponseEntity.ok(svc.getSummary());
+//    }
+
 
 //    @GetMapping("/portfolio/{portfolioId}")
 //    public ResponseEntity<List<Holdings>> byPortfolio(@PathVariable Long portfolioId) {

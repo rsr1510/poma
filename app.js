@@ -2,6 +2,32 @@ const API_URL = "http://127.0.0.1:8080/prices";
 const HOLDINGS_API = "http://127.0.0.1:8080/api/holdings";
 const REFRESH_INTERVAL = 15000;
 
+const SUMMARY_API =
+  "http://127.0.0.1:8080/api/holdings/summary";
+
+async function loadSummary() {
+  try {
+    
+    const res = await fetch(SUMMARY_API);
+    const summary = await res.json();
+
+    document.getElementById("stocksStat").innerHTML =
+      `₹${(summary.STOCK || 0).toFixed(2)}<span>Stocks</span>`;
+
+    document.getElementById("bondsStat").innerHTML =
+      `₹${(summary.BOND || 0).toFixed(2)}<span>Bonds</span>`;
+
+    document.getElementById("cryptoStat").innerHTML =
+      `₹${(summary.CRYPTO || 0).toFixed(2)}<span>Crypto</span>`;
+
+    document.getElementById("cashStat").innerHTML =
+      `₹${(summary.CASH || 0).toFixed(2)}<span>Cash</span>`;
+  } catch (err) {
+    console.error("Error loading summary:", err);
+  }
+}
+
+
 // Load Holdings from DB
 async function loadHoldings() {
   const res = await fetch(HOLDINGS_API);
@@ -63,10 +89,48 @@ async function updatePrices() {
       row.querySelector(".pl").innerText = `₹${pl.toFixed(2)}`;
     }
   });
+  updateDashboardTotals();
 }
 
-// Load holdings once on startup
-window.addEventListener("load", loadHoldings);
+function updateDashboardTotals() {
+  const totals = {
+    STOCK: 0,
+    BOND: 0,
+    CRYPTO: 0,
+    CASH: 0
+  };
+
+  const rows = document.querySelectorAll("#holdingsBody tr");
+
+  rows.forEach(row => {
+    const type = row.children[1].innerText; // STOCK/CRYPTO...
+    const plText = row.querySelector(".pl").innerText.replace("₹", "");
+    const pl = parseFloat(plText);
+
+    if (!isNaN(pl)) {
+      totals[type] += pl;
+    }
+  });
+
+  document.getElementById("stocksStat").innerHTML =
+    `₹${totals.STOCK.toFixed(2)}<span>Stocks</span>`;
+
+  document.getElementById("bondsStat").innerHTML =
+    `₹${totals.BOND.toFixed(2)}<span>Bonds</span>`;
+
+  document.getElementById("cryptoStat").innerHTML =
+    `₹${totals.CRYPTO.toFixed(2)}<span>Crypto</span>`;
+
+  document.getElementById("cashStat").innerHTML =
+    `₹${totals.CASH.toFixed(2)}<span>Cash</span>`;
+}
+
+
+
+window.addEventListener("load", () => {
+  loadHoldings();
+});
+
 
 // Refresh prices every 15 sec
 setInterval(updatePrices, REFRESH_INTERVAL);

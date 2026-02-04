@@ -12,7 +12,9 @@ import org.poma.jpa.backend.repo.HoldingsRepo;
 import org.poma.jpa.backend.repo.UserRepo;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -83,6 +85,32 @@ public class HoldingsService {
         h.setUserId(portfolioId);
         return holdingsRepo.save(h);
     }
+
+//    public Map<String, BigDecimal> getSummary() {
+//
+//        List<Holdings> holdings = holdingsRepo.findAll();
+//
+//        Map<String, BigDecimal> totals = new HashMap<>();
+//
+//        for (Holdings h : holdings) {
+//
+//            String type = String.valueOf(h.getAsset().getType()); // Stock, Crypto, Bond
+//
+//            BigDecimal quantity = h.getQuantity();
+//            BigDecimal buyPrice = h.getAvgBuyPrice();
+//            BigDecimal currentPrice = h.getCurrentPrice();
+//
+//            // Profit/Loss = (current - buy) * qty
+//            BigDecimal pl = currentPrice.subtract(buyPrice)
+//                    .multiply(quantity);
+//
+//            totals.put(type,
+//                    totals.getOrDefault(type, BigDecimal.ZERO).add(pl));
+//        }
+//
+//        return totals;
+//    }
+
 
 //    // New DTO-based update method
 //    public Holdings update(Long id, HoldingsRequest req) {
