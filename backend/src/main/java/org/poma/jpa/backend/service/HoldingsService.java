@@ -33,10 +33,10 @@ public class HoldingsService {
     public List<Holdings> findAll() {
         return holdingsRepo.findAll();
     }
-
-    public List<Holdings> findByPortfolioId(Long portfolioId) {
-        return holdingsRepo.findByPortfolioOwnerId(portfolioId);
-    }
+//
+//    public List<Holdings> findByPortfolioId(Long portfolioId) {
+//        return holdingsRepo.findByPortfolioOwnerId(portfolioId);
+//    }
 
 //    public Holdings findById(Long id) {
 //        return holdingsRepo.findById(id)

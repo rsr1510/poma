@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 public class TransactionRequest {
 
+    // ✅ Symbol is enough (frontend sends this)
+    private String symbol;
 
     private BigDecimal quantity;
     private BigDecimal pricePerUnit;
@@ -11,7 +13,15 @@ public class TransactionRequest {
     private BigDecimal fees;
     private BigDecimal totalCost;
 
-    public TransactionRequest() {}
+    // ===== Getters + Setters =====
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
 
     public BigDecimal getQuantity() {
         return quantity;
