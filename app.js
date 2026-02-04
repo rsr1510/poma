@@ -618,3 +618,188 @@ function updateAssetOptions() {
 
   updateFees();
 }
+
+/* ============================= */
+/* Sell Modal Functions */
+/* ============================= */
+function openSellModal() {
+  document.getElementById("sellModal").style.display = "flex";
+  loadSellAssets();
+}
+
+function closeSellModal() {
+  document.getElementById("sellModal").style.display = "none";
+}
+
+async function loadSellAssets() {
+  try {
+    const res = await fetch(HOLDINGS_API);
+    const holdings = await res.json();
+    
+    const select = document.getElementById("sellAssetSelect");
+    select.innerHTML = '<option value="">Select asset</option>';
+    
+    holdings.forEach(h => {
+      const option = document.createElement("option");
+      option.value = h.asset.symbol;
+      option.textContent = `${h.asset.symbol} - ${h.asset.name} (${h.quantity} units)`;
+      option.dataset.units = h.quantity;
+      option.dataset.currentPrice = h.currentPrice;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Error loading assets for sell:", err);
+  }
+}
+
+function updateSellInfo() {
+  const select = document.getElementById("sellAssetSelect");
+  const selectedOption = select.options[select.selectedIndex];
+  
+  if (selectedOption.value) {
+    document.getElementById("sellAssetInfo").style.display = "block";
+    document.getElementById("currentUnits").textContent = selectedOption.dataset.units;
+    document.getElementById("currentPrice").textContent = selectedOption.dataset.currentPrice;
+    
+    // Set max for sell units input
+    document.getElementById("sellUnits").max = selectedOption.dataset.units;
+  } else {
+    document.getElementById("sellAssetInfo").style.display = "none";
+  }
+  
+  updateSellSummary();
+}
+
+function updateSellSummary() {
+  const select = document.getElementById("sellAssetSelect");
+  const selectedOption = select.options[select.selectedIndex];
+  const sellUnits = parseFloat(document.getElementById("sellUnits").value) || 0;
+  
+  if (selectedOption.value && sellUnits > 0) {
+    const currentPrice = parseFloat(selectedOption.dataset.currentPrice);
+    const marketValue = currentPrice * sellUnits;
+    document.getElementById("sellMarketValue").textContent = formatINR(marketValue);
+  } else {
+    document.getElementById("sellMarketValue").textContent = "₹0";
+  }
+}
+
+async function sellAsset() {
+  const symbol = document.getElementById("sellAssetSelect").value;
+  const quantity = parseFloat(document.getElementById("sellUnits").value);
+  
+  if (!symbol || !quantity) {
+    alert("Please select an asset and enter quantity to sell!");
+    return;
+  }
+  
+  try {
+    const payload = {
+      symbol: symbol,
+      quantity: quantity
+    };
+    
+    const res = await fetch("http://127.0.0.1:8080/api/holdings/sell", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    
+    if (!res.ok) {
+      throw new Error("Sell transaction failed!");
+    }
+    
+    alert("✅ Asset Sold Successfully!");
+    closeSellModal();
+    loadHoldings();
+    
+  } catch (err) {
+    console.error("Error selling asset:", err);
+    alert("❌ Error selling asset!");
+  }
+}
+
+/* ============================= */
+/* Load Assets from Database */
+/* ============================= */
+async function loadAssetsFromDatabase() {
+  try {
+    const res = await fetch("http://127.0.0.1:8080/api/assets");
+    const assets = await res.json();
+    
+    // Store assets globally for use in updateAssetOptions
+    window.databaseAssets = assets;
+    
+  } catch (err) {
+    console.error("Error loading assets from database:", err);
+  }
+}
+
+// Update the existing updateAssetOptions function to use database assets
+function updateAssetOptions() {
+  const type = document.getElementById("assetType").value;
+  const category = document.getElementById("assetCategory");
+  const platform = document.getElementById("platform");
+
+  category.innerHTML = "";
+  platform.innerHTML = "";
+
+  if (type === "cash") {
+    category.innerHTML = `<option>INR Cash</option>`;
+    platform.innerHTML = `<option value="none">No Platform</option>`;
+  } else if (window.databaseAssets) {
+    // Filter assets by type from database
+    const filteredAssets = window.databaseAssets.filter(asset => 
+      asset.type.toLowerCase() === type.toLowerCase()
+    );
+    
+    filteredAssets.forEach(asset => {
+      const option = document.createElement("option");
+      option.value = asset.symbol;
+      option.textContent = `${asset.name} (${asset.symbol})`;
+      category.appendChild(option);
+    });
+    
+    // Add platform options based on asset type
+    if (type === "stock") {
+      platform.innerHTML = `
+        <option value="zerodha">Zerodha</option>
+        <option value="groww">Groww</option>
+        <option value="upstox">Upstox</option>
+      `;
+    } else if (type === "crypto") {
+      platform.innerHTML = `
+        <option value="coinswitch">CoinSwitch</option>
+        <option value="wazirx">WazirX</option>
+        <option value="zebpay">ZebPay</option>
+      `;
+    } else if (type === "bonds") {
+      platform.innerHTML = `
+        <option value="zerodha">Zerodha</option>
+        <option value="groww">Groww</option>
+        <option value="5paisa">5paisa</option>
+      `;
+    }
+  } else {
+    // Fallback to hardcoded assets if database not loaded
+    if (type === "stock") {
+      category.innerHTML = topStocks
+        .map((stock) => `<option value="${stock.symbol}">${stock.name}</option>`)
+        .join("");
+      platform.innerHTML = `
+        <option value="zerodha">Zerodha</option>
+        <option value="groww">Groww</option>
+        <option value="upstox">Upstox</option>
+      `;
+    }
+    // ... rest of the existing logic for crypto and bonds
+  }
+
+  updateFees();
+}
+
+// Load assets when page loads
+window.addEventListener("load", () => {
+  loadAssetsFromDatabase();
+  loadHoldings();
+});

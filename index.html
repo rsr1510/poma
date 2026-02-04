@@ -45,30 +45,67 @@
         <div class="bill-row">
           <span>Total Investment:</span>
           <span id="totalInvestment">₹0</span>
-        </div>
+        </div><!--SELL_MODAL_PLACEHOLDER-->
         <div class="bill-row">
           <span>Fees:</span>
           <span id="fees">₹0</span>
-        </div>
+        </div><!--SELL_MODAL_PLACEHOLDER-->
         <div class="bill-row total">
           <span>Total Cost:</span>
           <span id="totalCost">₹0</span>
-        </div>
-      </div>
+        </div><!--SELL_MODAL_PLACEHOLDER-->
+      </div><!--SELL_MODAL_PLACEHOLDER-->
 
       <!-- Platform Fees Details -->
       <div class="platform-fees">
         <h4>Platform Fees</h4>
         <div id="platformFeeDetails">Select a platform to view fees</div>
-      </div>
+      </div><!--SELL_MODAL_PLACEHOLDER-->
 
       <div class="modal-actions">
         <button class="secondary" onclick="closeAssetModal()">Cancel</button>
         <button class="primary" onclick="saveAsset()">Save</button>
 
-      </div>
+      </div><!--SELL_MODAL_PLACEHOLDER-->
 
-    </div>
+    </div><!--SELL_MODAL_PLACEHOLDER-->
+  </div><!--SELL_MODAL_PLACEHOLDER-->
+
+  <!-- SELL ASSET POPUP -->
+  <div id="sellModal" class="modal">
+      <div class="modal-content">
+          <h3>Sell Asset</h3>
+
+          <!-- Asset Selection -->
+          <label>Select Asset to Sell</label>
+          <select id="sellAssetSelect" onchange="updateSellInfo()">
+              <option value="">Select asset</option>
+          </select>
+
+          <!-- Current Holdings Info -->
+          <div id="sellAssetInfo" style="display: none;">
+              <p><strong>Current Holdings:</strong> <span id="currentUnits">0</span> units</p>
+              <p><strong>Current Price:</strong> ₹<span id="currentPrice">0</span></p>
+          </div>
+
+          <!-- Units to Sell -->
+          <label>Units to Sell</label>
+          <input id="sellUnits" type="number" placeholder="Enter units to sell" min="1" oninput="updateSellSummary()">
+
+          <!-- Transaction Summary -->
+          <div class="bill">
+              <h4>Sell Transaction Summary</h4>
+              <div class="bill-row">
+                  <span>Estimated Market Value:</span>
+                  <span id="sellMarketValue">₹0</span>
+              </div>
+          </div>
+
+          <div class="modal-actions">
+              <button class="secondary" onclick="closeSellModal()">Cancel</button>
+              <button class="primary" onclick="sellAsset()">Sell</button>
+          </div>
+      </div>
   </div>
 
   <body>
@@ -88,8 +125,8 @@
         </span>
 
         <button class="primary" onclick="openAssetModal()">+ Add Asset</button>
-        <button class="secondary">Remove Asset</button>
-      </div>
+          <button class="secondary" onclick="openSellModal()">Remove Asset</button>
+      </div><!--SELL_MODAL_PLACEHOLDER-->
     </header>
 
     <div class="app">
@@ -106,36 +143,36 @@
             <div class="stat" id="bestAsset">
               <span>Best Performer</span>
               <div class="value">Loading...</div>
-            </div>
+            </div><!--SELL_MODAL_PLACEHOLDER-->
 
             <div class="stat" id="worstAsset">
               <span>Worst Performer</span>
               <div class="value">Loading...</div>
-            </div>
+            </div><!--SELL_MODAL_PLACEHOLDER-->
 
             <div class="stat" id="dailyChange">
               <span>Daily Change</span>
               <div class="value">Loading...</div>
-            </div>
-          </div>
+            </div><!--SELL_MODAL_PLACEHOLDER-->
+          </div><!--SELL_MODAL_PLACEHOLDER-->
           <div class="row">
             <div class="card">
               <h3>Asset Allocation</h3>
               <canvas id="allocationChart"></canvas>
-            </div>
+            </div><!--SELL_MODAL_PLACEHOLDER-->
 
             <div class="card wide">
               <h3>Portfolio vs Benchmark</h3>
               <canvas id="performanceChart"></canvas>
-            </div>
-          </div>
+            </div><!--SELL_MODAL_PLACEHOLDER-->
+          </div><!--SELL_MODAL_PLACEHOLDER-->
 
           <div class="row">
             <div class="stat" id="stocksStat">Loading...<span>Stocks</span></div>
             <div class="stat" id="bondsStat">Loading...<span>Bonds</span></div>
             <div class="stat" id="cryptoStat">Loading...<span>Crypto</span></div>
             <div class="stat" id="cashStat">Loading...<span>Cash</span></div>
-          </div>
+          </div><!--SELL_MODAL_PLACEHOLDER-->
           
           <div class="card fees-section">
             <h3>Platform Fees (All-in)</h3>
@@ -144,14 +181,14 @@
               <div class="asset-tab active" data-asset="stocks">Stocks</div>
               <div class="asset-tab" data-asset="bonds">Bonds</div>
               <div class="asset-tab" data-asset="crypto">Crypto</div>
-            </div>
+            </div><!--SELL_MODAL_PLACEHOLDER-->
 
             <div class="fees-grid" id="feesGrid"></div>
 
             <div class="fee-note" style="margin-top:12px">
               Indicative all-in cost per transaction. Capital gains tax not included.
-            </div>
-          </div>
+            </div><!--SELL_MODAL_PLACEHOLDER-->
+          </div><!--SELL_MODAL_PLACEHOLDER-->
 
           <div class="card">
             <h3>Tax & Fees Tracker</h3>
@@ -177,8 +214,8 @@
                 <td class="positive"><strong>₹21,415</strong></td>
               </tr>
             </table>
-          </div>
-        </div>
+          </div><!--SELL_MODAL_PLACEHOLDER-->
+        </div><!--SELL_MODAL_PLACEHOLDER-->
 
         <div id="holdings-view" class="view">
           <div class="card">
@@ -197,22 +234,22 @@
               </thead>
               <tbody id="holdingsBody"></tbody>
             </table>
-          </div>
-        </div>
+          </div><!--SELL_MODAL_PLACEHOLDER-->
+        </div><!--SELL_MODAL_PLACEHOLDER-->
 
         <div id="transactions-view" class="view">
           <div class="card">
             <h3>Transactions</h3>
             <p>Transaction history will be displayed here.</p>
-          </div>
-        </div>
+          </div><!--SELL_MODAL_PLACEHOLDER-->
+        </div><!--SELL_MODAL_PLACEHOLDER-->
 
         <div id="settings-view" class="view">
           <div class="card">
             <h3>Settings</h3>
             <p>Settings options will be displayed here.</p>
-          </div>
-        </div>
+          </div><!--SELL_MODAL_PLACEHOLDER-->
+        </div><!--SELL_MODAL_PLACEHOLDER-->
       </main>
 
       <aside class="ai-panel">
@@ -220,16 +257,16 @@
         <div class="ai-card">
           Your equity exposure is high; consider partial profit booking to
           reduce tax impact.
-        </div>
+        </div><!--SELL_MODAL_PLACEHOLDER-->
         <div class="ai-card">
           TCS has outperformed its sector benchmark by 6.2% this quarter.
-        </div>
+        </div><!--SELL_MODAL_PLACEHOLDER-->
         <div class="ai-card">
           High short-term gains detected — holding longer could reduce capital
           gains tax.
-        </div>
+        </div><!--SELL_MODAL_PLACEHOLDER-->
       </aside>
-    </div>
+    </div><!--SELL_MODAL_PLACEHOLDER-->
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="charts.js"></script>
