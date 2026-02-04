@@ -2,6 +2,69 @@ const API_URL = "http://127.0.0.1:8000/prices";
 const HOLDINGS_API = "http://127.0.0.1:8080/api/holdings";
 const REFRESH_INTERVAL = 15000;
 
+let topStocks = [
+  { "name": "Reliance Industries", "symbol": "RELIANCE.NS" },
+  { "name": "Tata Consultancy Services", "symbol": "TCS.NS" },
+  { "name": "Infosys", "symbol": "INFY.NS" },
+  { "name": "HDFC Bank", "symbol": "HDFCBANK.NS" },
+  { "name": "ICICI Bank", "symbol": "ICICIBANK.NS" },
+  { "name": "Bharti Airtel", "symbol": "BHARTIARTL.NS" },
+  { "name": "State Bank of India", "symbol": "SBIN.NS" },
+  { "name": "Kotak Mahindra Bank", "symbol": "KOTAKBANK.NS" },
+  { "name": "Axis Bank", "symbol": "AXISBANK.NS" },
+  { "name": "Larsen & Toubro", "symbol": "LT.NS" },
+  { "name": "ITC", "symbol": "ITC.NS" },
+  { "name": "Hindustan Unilever", "symbol": "HINDUNILVR.NS" },
+  { "name": "Tata Steel", "symbol": "TATASTEEL.NS" },
+  { "name": "NTPC", "symbol": "NTPC.NS" },
+  { "name": "Power Grid Corporation", "symbol": "POWERGRID.NS" },
+  { "name": "Coal India", "symbol": "COALINDIA.NS" },
+  { "name": "Oil and Natural Gas Corporation", "symbol": "ONGC.NS" },
+  { "name": "GAIL (India)", "symbol": "GAIL.NS" },
+  { "name": "Bharat Petroleum Corporation", "symbol": "BPCL.NS" },
+  { "name": "Hindustan Petroleum Corporation", "symbol": "HINDPETRO.NS" },
+  { "name": "Tata Motors", "symbol": "TATAMOTORS.NS" },
+  { "name": "Mahindra & Mahindra", "symbol": "M&M.NS" },
+  { "name": "Maruti Suzuki India", "symbol": "MARUTI.NS" },
+  { "name": "Bajaj Auto", "symbol": "BAJAJ-AUTO.NS" },
+  { "name": "Hero MotoCorp", "symbol": "HEROMOTOCO.NS" },
+  { "name": "Eicher Motors", "symbol": "EICHERMOT.NS" },
+  { "name": "UltraTech Cement", "symbol": "ULTRACEMCO.NS" },
+  { "name": "Shree Cement", "symbol": "SHREECEM.NS" },
+  { "name": "Grasim Industries", "symbol": "GRASIM.NS" },
+  { "name": "Ambuja Cements", "symbol": "AMBUJACEM.NS" },
+  { "name": "JSW Steel", "symbol": "JSWSTEEL.NS" },
+  { "name": "Tata Power", "symbol": "TATAPOWER.NS" },
+  { "name": "Adani Ports and Special Economic Zone", "symbol": "ADANIPORTS.NS" },
+  { "name": "Adani Enterprises", "symbol": "ADANIENT.NS" }
+];
+let topStocksLoaded = true;
+
+let topCryptos = [
+  { "name": "XRP USD", "symbol": "XRP-USD" },
+  { "name": "USD Coin USD", "symbol": "USDC-USD" },
+  { "name": "Solana USD", "symbol": "SOL-USD" },
+  { "name": "TRON USD", "symbol": "TRX-USD" },
+  { "name": "Wrapped TRON USD", "symbol": "WTRX-USD" },
+  { "name": "Lido Staked ETH USD", "symbol": "STETH-USD" },
+  { "name": "Dogecoin USD", "symbol": "DOGE-USD" },
+  { "name": "Cardano USD", "symbol": "ADA-USD" },
+  { "name": "Bitcoin Cash USD", "symbol": "BCH-USD" },
+  { "name": "Lido wstETH USD", "symbol": "WSTETH-USD" },
+  { "name": "Hyperliquid USD", "symbol": "HYPE32196-USD" },
+  { "name": "USDS USD", "symbol": "USDS33039-USD" }
+];
+
+let topBonds = [
+  { "name": "13 WEEK TREASURY BILL", "symbol": "^IRX" },
+  { "name": "Treasury Yield 5 Years", "symbol": "^FVX" },
+  { "name": "CBOE Interest Rate 10 Year T No", "symbol": "^TNX" },
+  { "name": "Treasury Yield 30 Years", "symbol": "^TYX" },
+  { "name": "2-Year T-Note Futures", "symbol": "2YY=F" },
+  { "name": "10-Year T-Note Futures", "symbol": "ZN=F" }
+];
+
+
 const feesData = {
   stocks: [
     {
@@ -65,8 +128,12 @@ const feesData = {
     },
     {
       platform: "WazirX",
-      allInPercent: 1.5,
-      breakdown: ["Trading fee", "GST (18%)", "1% TDS"],
+      allInPercent: 0.20,
+      breakdown: [
+        "Trading fee",
+        "GST (18%)",
+        "1% TDS"
+      ]
     },
     {
       platform: "ZebPay",
@@ -379,6 +446,23 @@ tabs.forEach((tab) => {
 // initial load
 renderFees("stocks");
 
+// Navigation
+const navButtons = document.querySelectorAll(".nav");
+const views = document.querySelectorAll(".view");
+
+navButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    // Remove active from all nav and views
+    navButtons.forEach(btn => btn.classList.remove("active"));
+    views.forEach(view => view.classList.remove("active"));
+
+    // Add active to clicked nav and corresponding view
+    button.classList.add("active");
+    const viewId = button.dataset.view + "-view";
+    document.getElementById(viewId).classList.add("active");
+  });
+});
+
 let currentFeePercent = 0;
 
 function updateFees() {
@@ -389,6 +473,7 @@ function updateFees() {
   if (assetType === "stock") assetKey = "stocks";
   if (assetType === "cash") {
     currentFeePercent = 0;
+    document.getElementById("platformFeeDetails").innerHTML = "No fees for cash";
     updateBill();
     return;
   }
@@ -400,11 +485,17 @@ function updateFees() {
     );
     if (platformData) {
       currentFeePercent = platformData.allInPercent;
+      document.getElementById("platformFeeDetails").innerHTML = `
+        <div class="fee-percent">~${platformData.allInPercent}%</div>
+        <div class="fee-breakdown">${platformData.breakdown.map(b => `• ${b}`).join("<br>")}</div>
+      `;
     } else {
       currentFeePercent = 0;
+      document.getElementById("platformFeeDetails").innerHTML = "No fees data available for this platform";
     }
   } else {
     currentFeePercent = 0;
+    document.getElementById("platformFeeDetails").innerHTML = "Select an asset type and platform";
   }
   updateBill();
 }
@@ -466,11 +557,7 @@ function updateAssetOptions() {
   }
 
   if (type === "stock") {
-    category.innerHTML = `
-      <option>Large Cap</option>
-      <option>Mid Cap</option>
-      <option>Small Cap</option>
-    `;
+    category.innerHTML = topStocks.map(stock => `<option value="${stock.symbol}">${stock.name}</option>`).join('');
     platform.innerHTML = `
       <option value="zerodha">Zerodha</option>
       <option value="groww">Groww</option>
@@ -479,15 +566,20 @@ function updateAssetOptions() {
   }
 
   if (type === "crypto") {
-    category.innerHTML = `
-      <option>Bitcoin</option>
-      <option>Ethereum</option>
-      <option>Altcoin</option>
-    `;
+    category.innerHTML = topCryptos.map(crypto => `<option value="${crypto.symbol}">${crypto.name}</option>`).join('');
     platform.innerHTML = `
       <option value="coinswitch">CoinSwitch</option>
       <option value="wazirx">WazirX</option>
       <option value="zebpay">ZebPay</option>
+    `;
+  }
+
+  if (type === "bonds") {
+    category.innerHTML = topBonds.map(bond => `<option value="${bond.symbol}">${bond.name}</option>`).join('');
+    platform.innerHTML = `
+      <option value="zerodha">Zerodha</option>
+      <option value="groww">Groww</option>
+      <option value="5paisa">5paisa</option>
     `;
   }
 
