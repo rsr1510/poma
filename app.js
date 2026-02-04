@@ -1,5 +1,7 @@
 const API_URL = "http://127.0.0.1:8000/prices";
 const HOLDINGS_API = "http://127.0.0.1:8080/api/holdings";
+const ALERTS_API = "http://127.0.0.1:8080/api/alerts";
+const NOTIFICATIONS_API = "http://127.0.0.1:8080/api/notifications";
 const REFRESH_INTERVAL = 15000;
 
 let topStocks = [
@@ -177,6 +179,7 @@ async function loadHoldings() {
         <td class="current-price">Loading...</td>
         <td class="market-value">Loading...</td>
         <td class="pl">Loading...</td>
+        <td><button class="alert-btn" onclick="openSetAlertModalForAsset('${symbol}')">Set Alert</button></td>
       `;
 
       tbody.appendChild(row);
@@ -376,11 +379,13 @@ window.addEventListener("load", () => {
 
 setInterval(updatePrices, REFRESH_INTERVAL);
 function openAssetModal() {
+  resetModalFields();
   document.getElementById("assetModal").style.display = "flex";
 }
 
 function closeAssetModal() {
   document.getElementById("assetModal").style.display = "none";
+  resetModalFields();
 }
 
 // function updateAssetOptions() {
@@ -517,55 +522,6 @@ function updateBill() {
   document.getElementById("totalCost").innerText = formatINR(totalCost);
 }
 
-async function saveAsset() {
-
-  // ✅ Selected Symbol from dropdown
-  const symbol = document.getElementById("assetCategory").value;
-
-  const quantity = parseFloat(document.getElementById("units").value);
-  const price = parseFloat(document.getElementById("pricePerUnit").value);
-  const platform = document.getElementById("platform").value;
-
-  if (!symbol || !quantity || !price) {
-    alert("Please fill all fields correctly!");
-    return;
-  }
-
-  // Fees Calculation
-  const fees = quantity * price * (currentFeePercent / 100);
-  const totalCost = quantity * price + fees;
-
-  // ✅ Payload sent to backend
-  const payload = {
-    symbol: symbol,
-    quantity: quantity,
-    pricePerUnit: price,
-    platform: platform,
-    fees: fees,
-    totalCost: totalCost
-  };
-
-  try {
-    const res = await fetch("http://127.0.0.1:8080/api/transactions/buy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      throw new Error("Transaction failed!");
-    }
-
-    alert("✅ Asset Bought Successfully!");
-
-    closeAssetModal();
-    loadHoldings();
-
-  } catch (err) {
-    console.error("Error saving transaction:", err);
-    alert("❌ Error saving transaction!");
-  }
-}
 
 
 function updateAssetOptions() {
@@ -802,4 +758,423 @@ function updateAssetOptions() {
 window.addEventListener("load", () => {
   loadAssetsFromDatabase();
   loadHoldings();
+  loadNotifications();
+  updateNotificationBadge();
 });
+
+/* ============================= */
+/* Price Alert Functions */
+/* ============================= */
+function toggleAlertFields() {
+  const enableAlert = document.getElementById("enableAlert").checked;
+  const alertFields = document.getElementById("alertFields");
+  alertFields.style.display = enableAlert ? "block" : "none";
+}
+
+function resetModalFields() {
+  document.getElementById("assetType").value = "";
+  document.getElementById("assetCategory").innerHTML = '<option value="">Select asset type first</option>';
+  document.getElementById("platform").innerHTML = '';
+  document.getElementById("units").value = "";
+  document.getElementById("pricePerUnit").value = "";
+  document.getElementById("enableAlert").checked = false;
+  document.getElementById("alertFields").style.display = "none";
+  document.getElementById("thresholdPrice").value = "";
+  document.getElementById("alertCondition").value = "ABOVE";
+  updateBill();
+}
+
+function resetAlertModalFields() {
+  document.getElementById("alertAssetSelect").value = "";
+  document.getElementById("thresholdPriceModal").value = "";
+  document.getElementById("alertConditionModal").value = "ABOVE";
+}
+
+async function saveAsset() {
+  // ✅ Selected Symbol from dropdown
+  const symbol = document.getElementById("assetCategory").value;
+
+  const quantity = parseFloat(document.getElementById("units").value);
+  const price = parseFloat(document.getElementById("pricePerUnit").value);
+  const platform = document.getElementById("platform").value;
+
+  if (!symbol || !quantity || !price) {
+    alert("Please fill all fields correctly!");
+    return;
+  }
+
+  // Fees Calculation
+  const fees = quantity * price * (currentFeePercent / 100);
+  const totalCost = quantity * price + fees;
+
+  // ✅ Payload sent to backend
+  const payload = {
+    symbol: symbol,
+    quantity: quantity,
+    pricePerUnit: price,
+    platform: platform,
+    fees: fees,
+    totalCost: totalCost
+  };
+
+  try {
+    const res = await fetch("http://127.0.0.1:8080/api/transactions/buy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error("Transaction failed!");
+    }
+
+    // Save alert if enabled
+    if (document.getElementById("enableAlert").checked) {
+      await saveAlertForAsset(symbol);
+    }
+
+    alert("✅ Asset Bought Successfully!");
+
+    closeAssetModal();
+    loadHoldings();
+
+  } catch (err) {
+    console.error("Error saving transaction:", err);
+    alert("❌ Error saving transaction!");
+  }
+}
+
+async function saveAlertForAsset(symbol) {
+  try {
+    // Get asset ID from symbol
+    const assetsRes = await fetch("http://127.0.0.1:8080/api/assets");
+    const assets = await assetsRes.json();
+    const asset = assets.find(a => a.symbol === symbol);
+    
+    if (!asset) {
+      console.error("Asset not found for symbol:", symbol);
+      return;
+    }
+
+    const alertPayload = {
+      assetId: asset.id,
+      thresholdPrice: parseFloat(document.getElementById("thresholdPrice").value),
+      condition: document.getElementById("alertCondition").value
+    };
+
+    const alertRes = await fetch(ALERTS_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(alertPayload),
+    });
+
+    if (!alertRes.ok) {
+      throw new Error("Alert creation failed!");
+    }
+
+    console.log("Alert created successfully");
+  } catch (err) {
+    console.error("Error creating alert:", err);
+  }
+}
+
+/* ============================= */
+/* Set Alert Modal Functions */
+/* ============================= */
+function openSetAlertModal() {
+  resetAlertModalFields();
+  document.getElementById("setAlertModal").style.display = "flex";
+  loadAlertAssets();
+}
+
+function closeSetAlertModal() {
+  document.getElementById("setAlertModal").style.display = "none";
+  resetAlertModalFields();
+}
+
+async function loadAlertAssets() {
+  try {
+    const res = await fetch(HOLDINGS_API);
+    const holdings = await res.json();
+    
+    const select = document.getElementById("alertAssetSelect");
+    select.innerHTML = '<option value="">Select asset</option>';
+    
+    holdings.forEach(h => {
+      const option = document.createElement("option");
+      option.value = h.asset.id;
+      option.textContent = `${h.asset.symbol} - ${h.asset.name}`;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Error loading assets for alert:", err);
+  }
+}
+
+async function saveAlert() {
+  const assetId = document.getElementById("alertAssetSelect").value;
+  const thresholdPrice = parseFloat(document.getElementById("thresholdPriceModal").value);
+  const condition = document.getElementById("alertConditionModal").value;
+
+  if (!assetId || !thresholdPrice) {
+    alert("Please select an asset and enter threshold price!");
+    return;
+  }
+
+  try {
+    const payload = {
+      assetId: parseInt(assetId),
+      thresholdPrice: thresholdPrice,
+      condition: condition
+    };
+    
+    const res = await fetch(ALERTS_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    
+    if (!res.ok) {
+      throw new Error("Alert creation failed!");
+    }
+    
+    alert("✅ Alert Set Successfully!");
+    closeSetAlertModal();
+    
+  } catch (err) {
+    console.error("Error setting alert:", err);
+    alert("❌ Error setting alert!");
+  }
+}
+
+/* ============================= */
+/* Notification Center Functions */
+/* ============================= */
+function toggleNotificationCenter() {
+  const notificationCenter = document.getElementById("notificationCenter");
+  const isVisible = notificationCenter.style.display !== "none";
+  
+  if (isVisible) {
+    notificationCenter.style.display = "none";
+  } else {
+    notificationCenter.style.display = "block";
+    loadNotifications();
+  }
+}
+
+async function loadNotifications() {
+  try {
+    const res = await fetch(NOTIFICATIONS_API);
+    const notifications = await res.json();
+    
+    const notificationList = document.getElementById("notificationList");
+    notificationList.innerHTML = "";
+    
+    if (notifications.length === 0) {
+      notificationList.innerHTML = "<div class='no-notifications'>No notifications</div>";
+      return;
+    }
+    
+    notifications.forEach(notification => {
+      const profitLoss = getProfitLossForAsset(notification.asset.symbol);
+      const notificationEl = document.createElement("div");
+      notificationEl.className = `notification-item ${!notification.isRead ? 'unread' : ''}`;
+      notificationEl.innerHTML = `
+        <div class="notification-content">
+          <div class="notification-message">${notification.message}</div>
+          <div class="notification-meta">
+            <span class="notification-time">${new Date(notification.createdAt).toLocaleString()}</span>
+            <span class="notification-price">P/L: ${formatINR(profitLoss)}</span>
+          </div>
+        </div>
+        <div class="notification-actions">
+          ${!notification.isRead ? `<button class="mark-read-btn" onclick="markNotificationAsRead(${notification.id})">Mark as read</button>` : ''}
+          <button class="delete-btn" onclick="deleteNotification(${notification.id})">Delete</button>
+        </div>
+      `;
+      notificationList.appendChild(notificationEl);
+    });
+    
+    // Add clear all button if there are notifications
+    if (notifications.length > 0) {
+      const clearAllBtn = document.createElement("button");
+      clearAllBtn.className = "clear-all-btn";
+      clearAllBtn.textContent = "Clear All Notifications";
+      clearAllBtn.onclick = clearAllNotifications;
+      notificationList.appendChild(clearAllBtn);
+    }
+    
+  } catch (err) {
+    console.error("Error loading notifications:", err);
+  }
+}
+
+async function markNotificationAsRead(notificationId) {
+  try {
+    const res = await fetch(`${NOTIFICATIONS_API}/${notificationId}/read`, {
+      method: "PATCH"
+    });
+    
+    if (res.ok) {
+      loadNotifications();
+      updateNotificationBadge();
+    }
+  } catch (err) {
+    console.error("Error marking notification as read:", err);
+  }
+}
+
+async function markAllNotificationsAsRead() {
+  try {
+    const res = await fetch(`${NOTIFICATIONS_API}/mark-all-read`, {
+      method: "PATCH"
+    });
+    
+    if (res.ok) {
+      loadNotifications();
+      updateNotificationBadge();
+    }
+  } catch (err) {
+    console.error("Error marking all notifications as read:", err);
+  }
+}
+
+async function updateNotificationBadge() {
+  try {
+    const res = await fetch(`${NOTIFICATIONS_API}/unread-count`);
+    const data = await res.json();
+    const count = data.count;
+    
+    const badge = document.getElementById("notificationBadge");
+    if (count > 0) {
+      badge.textContent = count > 99 ? "99+" : count;
+      badge.style.display = "block";
+    } else {
+      badge.style.display = "none";
+    }
+  } catch (err) {
+    console.error("Error updating notification badge:", err);
+  }
+}
+
+async function deleteNotification(notificationId) {
+  try {
+    const res = await fetch(`${NOTIFICATIONS_API}/${notificationId}`, {
+      method: 'DELETE'
+    });
+    
+    if (res.ok) {
+      loadNotifications();
+      updateNotificationBadge();
+    }
+  } catch (err) {
+    console.error("Error deleting notification:", err);
+  }
+}
+
+async function clearAllNotifications() {
+  if (confirm("Are you sure you want to clear all notifications?")) {
+    try {
+      const res = await fetch(`${NOTIFICATIONS_API}/clear-all`, {
+        method: 'DELETE'
+      });
+      
+      if (res.ok) {
+        loadNotifications();
+        updateNotificationBadge();
+      }
+    } catch (err) {
+      console.error("Error clearing notifications:", err);
+    }
+  }
+}
+
+function getProfitLossForAsset(symbol) {
+  const row = document.querySelector(`#holdingsBody tr[data-symbol="${symbol}"]`);
+  if (!row) return 0;
+  
+  const plText = row.querySelector(".pl").innerText.replace(/₹|,/g, "");
+  return parseFloat(plText) || 0;
+}
+
+// WebSocket or polling for new notifications
+let lastNotificationCount = 0;
+async function checkForNewNotifications() {
+  try {
+    const res = await fetch(`${NOTIFICATIONS_API}/unread`);
+    const notifications = await res.json();
+    
+    if (notifications.length > lastNotificationCount) {
+      // New notification received - show popup
+      const latestNotification = notifications[0];
+      showNotificationPopup(latestNotification);
+      lastNotificationCount = notifications.length;
+    }
+    
+    updateNotificationBadge();
+  } catch (err) {
+    console.error("Error checking for new notifications:", err);
+  }
+}
+
+function showNotificationPopup(notification) {
+  const profitLoss = getProfitLossForAsset(notification.asset.symbol);
+  
+  // Create popup element
+  const popup = document.createElement("div");
+  popup.className = "notification-popup";
+  popup.innerHTML = `
+    <div class="popup-content">
+      <div class="popup-header">
+        <h4>Price Alert</h4>
+        <button class="popup-close" onclick="this.parentElement.parentElement.remove()">×</button>
+      </div>
+      <div class="popup-body">
+        <p>${notification.message}</p>
+        <div class="popup-meta">
+          <span>P/L: ${formatINR(profitLoss)}</span>
+          <span>${new Date(notification.createdAt).toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add to page and auto-remove after 5 seconds
+  document.body.appendChild(popup);
+  setTimeout(() => {
+    if (popup.parentElement) {
+      popup.remove();
+    }
+  }, 5000);
+}
+
+// Check for new notifications every 10 seconds
+setInterval(checkForNewNotifications, 10000);
+
+// Update notification badge
+setInterval(updateNotificationBadge, 30000);
+
+async function openSetAlertModalForAsset(symbol) {
+  openSetAlertModal();
+  
+  // Select the asset in the dropdown
+  setTimeout(() => {
+    const select = document.getElementById("alertAssetSelect");
+    for (let option of select.options) {
+      if (option.textContent.includes(symbol)) {
+        select.value = option.value;
+        break;
+      }
+    }
+  }, 100);
+}
+
+// Update the existing loadHoldings function to include alert buttons
+const originalLoadHoldings = loadHoldings;
+loadHoldings = async function() {
+  await originalLoadHoldings();
+  setTimeout(updateHoldingsTableWithAlerts, 100);
+};
+
+// Periodically update notification badge
+setInterval(updateNotificationBadge, 30000);
