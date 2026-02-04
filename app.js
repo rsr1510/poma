@@ -75,8 +75,8 @@ const feesData = {
         "STT (0.1%)",
         "Exchange & SEBI charges",
         "GST on charges",
-        "Stamp duty"
-      ]
+        "Stamp duty",
+      ],
     },
     {
       platform: "Groww",
@@ -86,59 +86,45 @@ const feesData = {
         "STT (0.1%)",
         "Exchange & SEBI charges",
         "GST on charges",
-        "Stamp duty"
-      ]
+        "Stamp duty",
+      ],
     },
     {
       platform: "Upstox",
-      allInPercent: 0.40,
+      allInPercent: 0.4,
       breakdown: [
         "Brokerage (₹20 or %)",
         "STT (0.1%)",
         "Exchange & SEBI charges",
         "GST on charges",
-        "Stamp duty"
-      ]
-    }
+        "Stamp duty",
+      ],
+    },
   ],
 
   bonds: [
     {
       platform: "Zerodha",
-      allInPercent: 0.10,
-      breakdown: [
-        "Platform fee",
-        "GST (18%)"
-      ]
+      allInPercent: 0.1,
+      breakdown: ["Platform fee", "GST (18%)"],
     },
     {
       platform: "Groww",
-      allInPercent: 0.10,
-      breakdown: [
-        "Platform fee",
-        "GST (18%)"
-      ]
+      allInPercent: 0.1,
+      breakdown: ["Platform fee", "GST (18%)"],
     },
     {
       platform: "5paisa",
       allInPercent: 0.08,
-      breakdown: [
-        "Flat brokerage",
-        "Exchange charges",
-        "GST (18%)"
-      ]
-    }
+      breakdown: ["Flat brokerage", "Exchange charges", "GST (18%)"],
+    },
   ],
 
   crypto: [
     {
       platform: "CoinSwitch",
-      allInPercent: 1.50,
-      breakdown: [
-        "Trading fee",
-        "GST (18%)",
-        "1% TDS"
-      ]
+      allInPercent: 1.5,
+      breakdown: ["Trading fee", "GST (18%)", "1% TDS"],
     },
     {
       platform: "WazirX",
@@ -151,14 +137,10 @@ const feesData = {
     },
     {
       platform: "ZebPay",
-      allInPercent: 1.80,
-      breakdown: [
-        "Trading fee",
-        "GST (18%)",
-        "1% TDS"
-      ]
-    }
-  ]
+      allInPercent: 1.8,
+      breakdown: ["Trading fee", "GST (18%)", "1% TDS"],
+    },
+  ],
 };
 
 /* ============================= */
@@ -329,8 +311,7 @@ function updatePortfolioSummary() {
     formatINR(totalMarketValue);
 
   const returnEl = document.getElementById("portfolioReturn");
-  returnEl.innerText =
-    `${returnPercent >= 0 ? "+" : ""}${returnPercent.toFixed(2)}%`;
+  returnEl.innerText = `${returnPercent >= 0 ? "+" : ""}${returnPercent.toFixed(2)}%`;
 
   // Color Return
   returnEl.className = returnPercent >= 0 ? "positive" : "negative";
@@ -436,7 +417,7 @@ const feesGrid = document.getElementById("feesGrid");
 function renderFees(asset) {
   feesGrid.innerHTML = "";
 
-  feesData[asset].forEach(item => {
+  feesData[asset].forEach((item) => {
     feesGrid.innerHTML += `
       <div class="fee-card">
         <h4>${item.platform}</h4>
@@ -447,16 +428,16 @@ function renderFees(asset) {
         </div>
 
         <div class="fee-breakdown">
-          ${item.breakdown.map(b => `• ${b}`).join("<br>")}
+          ${item.breakdown.map((b) => `• ${b}`).join("<br>")}
         </div>
       </div>
     `;
   });
 }
 
-tabs.forEach(tab => {
+tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
-    tabs.forEach(t => t.classList.remove("active"));
+    tabs.forEach((t) => t.classList.remove("active"));
     tab.classList.add("active");
     renderFees(tab.dataset.asset);
   });
@@ -499,7 +480,9 @@ function updateFees() {
 
   const data = feesData[assetKey];
   if (data) {
-    const platformData = data.find(p => p.platform.toLowerCase() === platform);
+    const platformData = data.find(
+      (p) => p.platform.toLowerCase() === platform,
+    );
     if (platformData) {
       currentFeePercent = platformData.allInPercent;
       document.getElementById("platformFeeDetails").innerHTML = `
@@ -519,15 +502,45 @@ function updateFees() {
 
 function updateBill() {
   const units = parseFloat(document.getElementById("units").value) || 0;
-  const pricePerUnit = parseFloat(document.getElementById("pricePerUnit").value) || 0;
+  const pricePerUnit =
+    parseFloat(document.getElementById("pricePerUnit").value) || 0;
 
   const totalInvestment = units * pricePerUnit;
   const fees = totalInvestment * (currentFeePercent / 100);
   const totalCost = totalInvestment + fees;
 
-  document.getElementById("totalInvestment").innerText = formatINR(totalInvestment);
+  document.getElementById("totalInvestment").innerText =
+    formatINR(totalInvestment);
   document.getElementById("fees").innerText = formatINR(fees);
   document.getElementById("totalCost").innerText = formatINR(totalCost);
+}
+
+async function saveAsset() {
+  const quantity = parseFloat(document.getElementById("units").value);
+  const price = parseFloat(document.getElementById("pricePerUnit").value);
+  const platform = document.getElementById("platform").value;
+
+  const fees = quantity * price * 0.005; // example
+  const totalCost = quantity * price + fees;
+
+  const payload = {
+    quantity: quantity,
+    pricePerUnit: price,
+    platform: platform,
+    fees: fees,
+    totalCost: totalCost,
+  };
+
+  await fetch("http://127.0.0.1:8080/api/transactions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  alert("Transaction saved successfully!");
+
+  closeAssetModal();
+  loadHoldings();
 }
 
 function updateAssetOptions() {
@@ -572,5 +585,3 @@ function updateAssetOptions() {
 
   updateFees();
 }
-
-
