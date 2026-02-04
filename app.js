@@ -465,6 +465,23 @@ tabs.forEach(tab => {
 // initial load
 renderFees("stocks");
 
+// Navigation
+const navButtons = document.querySelectorAll(".nav");
+const views = document.querySelectorAll(".view");
+
+navButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    // Remove active from all nav and views
+    navButtons.forEach(btn => btn.classList.remove("active"));
+    views.forEach(view => view.classList.remove("active"));
+
+    // Add active to clicked nav and corresponding view
+    button.classList.add("active");
+    const viewId = button.dataset.view + "-view";
+    document.getElementById(viewId).classList.add("active");
+  });
+});
+
 let currentFeePercent = 0;
 
 function updateFees() {

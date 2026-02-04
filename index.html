@@ -93,106 +93,124 @@
 
     <div class="app">
       <aside class="sidebar">
-        <button class="nav active">Dashboard</button>
-        <button class="nav">Holdings</button>
-        <button class="nav">Performance</button>
-        <button class="nav">Settings</button>
+        <button class="nav active" data-view="dashboard">Dashboard</button>
+        <button class="nav" data-view="holdings">Holdings</button>
+        <button class="nav" data-view="transactions">Transactions</button>
+        <button class="nav" data-view="settings">Settings</button>
       </aside>
 
       <main class="content">
-        <div class="row">
-        <div class="stat" id="bestAsset">
-          <span>Best Performer</span>
-          <div class="value">Loading...</div>
-        </div>
+        <div id="dashboard-view" class="view active">
+          <div class="row">
+            <div class="stat" id="bestAsset">
+              <span>Best Performer</span>
+              <div class="value">Loading...</div>
+            </div>
 
-        <div class="stat" id="worstAsset">
-          <span>Worst Performer</span>
-          <div class="value">Loading...</div>
-        </div>
+            <div class="stat" id="worstAsset">
+              <span>Worst Performer</span>
+              <div class="value">Loading...</div>
+            </div>
 
-        <div class="stat" id="dailyChange">
-          <span>Daily Change</span>
-          <div class="value">Loading...</div>
-        </div>
-      </div>
-        <div class="row">
+            <div class="stat" id="dailyChange">
+              <span>Daily Change</span>
+              <div class="value">Loading...</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="card">
+              <h3>Asset Allocation</h3>
+              <canvas id="allocationChart"></canvas>
+            </div>
+
+            <div class="card wide">
+              <h3>Portfolio vs Benchmark</h3>
+              <canvas id="performanceChart"></canvas>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="stat" id="stocksStat">Loading...<span>Stocks</span></div>
+            <div class="stat" id="bondsStat">Loading...<span>Bonds</span></div>
+            <div class="stat" id="cryptoStat">Loading...<span>Crypto</span></div>
+            <div class="stat" id="cashStat">Loading...<span>Cash</span></div>
+          </div>
+          
+          <div class="card fees-section">
+            <h3>Platform Fees (All-in)</h3>
+
+            <div class="asset-tabs">
+              <div class="asset-tab active" data-asset="stocks">Stocks</div>
+              <div class="asset-tab" data-asset="bonds">Bonds</div>
+              <div class="asset-tab" data-asset="crypto">Crypto</div>
+            </div>
+
+            <div class="fees-grid" id="feesGrid"></div>
+
+            <div class="fee-note" style="margin-top:12px">
+              Indicative all-in cost per transaction. Capital gains tax not included.
+            </div>
+          </div>
+
           <div class="card">
-            <h3>Asset Allocation</h3>
-            <canvas id="allocationChart"></canvas>
-          </div>
-
-          <div class="card wide">
-            <h3>Portfolio vs Benchmark</h3>
-            <canvas id="performanceChart"></canvas>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="stat" id="stocksStat">Loading...<span>Stocks</span></div>
-          <div class="stat" id="bondsStat">Loading...<span>Bonds</span></div>
-          <div class="stat" id="cryptoStat">Loading...<span>Crypto</span></div>
-          <div class="stat" id="cashStat">Loading...<span>Cash</span></div>
-        </div>
-        
-        <div class="card fees-section">
-          <h3>Platform Fees (All-in)</h3>
-
-          <div class="asset-tabs">
-            <div class="asset-tab active" data-asset="stocks">Stocks</div>
-            <div class="asset-tab" data-asset="bonds">Bonds</div>
-            <div class="asset-tab" data-asset="crypto">Crypto</div>
-          </div>
-
-          <div class="fees-grid" id="feesGrid"></div>
-
-          <div class="fee-note" style="margin-top:12px">
-            Indicative all-in cost per transaction. Capital gains tax not included.
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Your Holdings</h3>
-          <table id="holdingsTable">
-            <thead>
+            <h3>Tax & Fees Tracker</h3>
+            <table>
               <tr>
-                <th>Symbol</th>
-                <th>Asset</th>
-                <th>Units</th>
-                <th>Buy Price (₹)</th>
-                <th>Current Price (₹)</th>
-                <th>Market Value (₹)</th>
-                <th>P/L (₹)</th>
+                <td>Total Invested Amount</td>
+                <td>₹2,20,000</td>
               </tr>
-            </thead>
-            <tbody id="holdingsBody"></tbody>
-          </table>
+              <tr>
+                <td>Total Profit Earned</td>
+                <td class="positive">₹26,900</td>
+              </tr>
+              <tr>
+                <td>Brokerage & Platform Fees</td>
+                <td>₹1,450</td>
+              </tr>
+              <tr>
+                <td>Estimated Capital Gains Tax (15%)</td>
+                <td>₹4,035</td>
+              </tr>
+              <tr>
+                <td><strong>Net Profit After Fees & Tax</strong></td>
+                <td class="positive"><strong>₹21,415</strong></td>
+              </tr>
+            </table>
+          </div>
         </div>
 
-        <div class="card">
-          <h3>Tax & Fees Tracker</h3>
-          <table>
-            <tr>
-              <td>Total Invested Amount</td>
-              <td>₹2,20,000</td>
-            </tr>
-            <tr>
-              <td>Total Profit Earned</td>
-              <td class="positive">₹26,900</td>
-            </tr>
-            <tr>
-              <td>Brokerage & Platform Fees</td>
-              <td>₹1,450</td>
-            </tr>
-            <tr>
-              <td>Estimated Capital Gains Tax (15%)</td>
-              <td>₹4,035</td>
-            </tr>
-            <tr>
-              <td><strong>Net Profit After Fees & Tax</strong></td>
-              <td class="positive"><strong>₹21,415</strong></td>
-            </tr>
-          </table>
+        <div id="holdings-view" class="view">
+          <div class="card">
+            <h3>Your Holdings</h3>
+            <table id="holdingsTable">
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Asset</th>
+                  <th>Units</th>
+                  <th>Buy Price (₹)</th>
+                  <th>Current Price (₹)</th>
+                  <th>Market Value (₹)</th>
+                  <th>P/L (₹)</th>
+                </tr>
+              </thead>
+              <tbody id="holdingsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="transactions-view" class="view">
+          <div class="card">
+            <h3>Transactions</h3>
+            <p>Transaction history will be displayed here.</p>
+          </div>
+        </div>
+
+        <div id="settings-view" class="view">
+          <div class="card">
+            <h3>Settings</h3>
+            <p>Settings options will be displayed here.</p>
+          </div>
         </div>
       </main>
 
