@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tax Engine Test</title>
+</head>
+<body>
+    <h1>Tax Engine Test</h1>
+    <div id="output"></div>
+
+    <script src="taxEngine.js"></script>
+    <script src="taxOptimization.js"></script>
+    <script>
+        const assets = [
+            { symbol: 'TCS.NS', type: 'stocks', quantity: 10, buyPrice: 3000, currentPrice: 3500, buyDate: null },
+            { symbol: 'BTC-USD', type: 'crypto', quantity: 0.1, buyPrice: 40000, currentPrice: 50000, buyDate: null }
+        ];
+
+        const metrics = calculateTaxMetrics(assets);
+        const signals = generateTaxSignals(assets);
+
+        document.getElementById('output').innerHTML = `
+            <h2>Tax Metrics:</h2>
+            <pre>${JSON.stringify(metrics, null, 2)}</pre>
+            <h2>Tax Signals:</h2>
+            <pre>${JSON.stringify(signals, null, 2)}</pre>
+        `;
+    </script>
+</body>
+</html>

@@ -7,6 +7,8 @@ import org.poma.jpa.backend.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/transactions")
 @CrossOrigin("*")
@@ -32,5 +34,10 @@ public class TransactionController {
             @RequestBody SellRequest req
     ) {
         return ResponseEntity.ok(service.sell(req));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Transactions>> getAllTransactions() {
+        return ResponseEntity.ok(service.getAllTransactions());
     }
 }

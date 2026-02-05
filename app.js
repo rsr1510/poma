@@ -192,6 +192,51 @@ async function loadHoldings() {
   }
 }
 
+async function loadTransactions() {
+  const tableBody = document.getElementById("transactions-body");
+  tableBody.innerHTML = "<tr><td colspan='8'>Loading...</td></tr>";
+
+  try {
+    const response = await fetch("http://localhost:8080/api/transactions");
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch transactions");
+    }
+
+    const transactions = await response.json();
+    tableBody.innerHTML = "";
+
+    if (transactions.length === 0) {
+      tableBody.innerHTML =
+        "<tr><td colspan='8'>No transactions found</td></tr>";
+      return;
+    }
+
+    transactions.forEach(tx => {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${new Date(tx.transactionDate).toLocaleString()}</td>
+        <td>${tx.asset?.symbol ?? "-"}</td>
+        <td>${tx.transactionType}</td>
+        <td>${tx.quantity}</td>
+        <td>${tx.pricePerUnit ?? "-"}</td>
+        <td>${tx.fees ?? "-"}</td>
+        <td>${tx.totalCost ?? tx.marketValue ?? "-"}</td>
+        <td>${tx.platform ?? "-"}</td>
+      `;
+
+      tableBody.appendChild(row);
+    });
+
+  } catch (error) {
+    console.error(error);
+    tableBody.innerHTML =
+      "<tr><td colspan='8'>Error loading transactions</td></tr>";
+  }
+}
+
+
 /* ============================= */
 /* Fetch Live Prices + Update Table */
 /* ============================= */
@@ -759,6 +804,7 @@ function updateAssetOptions() {
 window.addEventListener("load", () => {
   loadAssetsFromDatabase();
   loadHoldings();
+  loadTransactions();
   loadNotifications();
   updateNotificationBadge();
 });
@@ -1209,7 +1255,7 @@ async function openSetAlertModalForAsset(symbol) {
 const originalLoadHoldings = loadHoldings;
 loadHoldings = async function() {
   await originalLoadHoldings();
-  setTimeout(updateHoldingsTableWithAlerts, 100);
+  // setTimeout(updateHoldingsTableWithAlerts, 100);
 };
 
 async function toggleAlertForAsset(symbol) {
