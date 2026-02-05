@@ -761,6 +761,7 @@ window.addEventListener("load", () => {
   loadHoldings();
   loadNotifications();
   updateNotificationBadge();
+  loadTaxSummary();
 });
 
 /* ============================= */
@@ -1308,5 +1309,34 @@ async function testAlertEvaluation() {
   } catch (err) {
     console.error("Error testing alert evaluation:", err);
     alert("Error testing alert evaluation!");
+  }
+}
+async function loadTaxSummary() {
+  try {
+    const res = await fetch("http://127.0.0.1:8080/api/transactions/summary");
+    if (!res.ok) throw new Error("Failed to load tax summary");
+
+    const data = await res.json();
+
+    document.getElementById("taxTotalInvested").innerText =
+      formatINR(data.totalInvested || 0);
+
+    document.getElementById("taxTotalProfit").innerText =
+      formatINR(data.totalProfit || 0);
+
+    document.getElementById("taxTotalFees").innerText =
+      formatINR(data.totalFees || 0);
+
+    document.getElementById("taxEstimated").innerText =
+      formatINR(data.estimatedTax || 0);
+
+    const netProfitEl = document.getElementById("taxNetProfit");
+    netProfitEl.innerText = formatINR(data.netProfit || 0);
+
+    netProfitEl.className =
+      data.netProfit >= 0 ? "positive" : "negative";
+
+  } catch (err) {
+    console.error("Error loading tax summary:", err);
   }
 }
