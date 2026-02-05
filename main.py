@@ -2,11 +2,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
 import yfinance as yf
-import google.generativeai as genai
+from google import genai
 import os
 import httpx
 import json
 from datetime import datetime
+from dotenv import load_dotenv
+
+print("🔥 FASTAPI MAIN.PY LOADED 🔥")
 
 app = FastAPI()
 
@@ -19,13 +22,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+load_dotenv()  # loads .env into os.environ
+
 # Gemini API Configuration
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+# GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+# if GEMINI_API_KEY:
+#     genai.configure(api_key=GEMINI_API_KEY)
+# print("Gemini key loaded:", bool(GEMINI_API_KEY))
+GEMINI_API_KEY="AIzaSyB2WlEFahnHcKVRyYhaW28p8h94TmniZyc"
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 # Java Backend URL
-JAVA_BACKEND_URL = "http://127.0.0.1:8080"
+JAVA_BACKEND_URL = "http://127.0.0.1:8082"
 
 @app.post("/prices")
 def get_prices(symbols: List[str]):
@@ -48,67 +56,53 @@ def get_prices(symbols: List[str]):
 @app.get("/ai-insights")
 async def get_ai_insights():
     """
-    Generate AI insights based on portfolio holdings, market conditions, and portfolio performance.
+    Generate AI insights based on portfolio holdings and market data.
     """
+    print("🔥 /ai-insights called")
+
     if not GEMINI_API_KEY:
         return {
             "insights": [
-                "⚠️ Gemini API key not configured. Please set GEMINI_API_KEY environment variable.",
-                "To get AI insights, add your Gemini API key to the environment variables.",
-                "Visit https://makersuite.google.com/app/apikey to get your API key."
+                "⚠️ Gemini API key not configured.",
+                "Set GEMINI_API_KEY in environment variables."
             ]
         }
-    
+
     try:
-        # Fetch holdings from Java backend
         async with httpx.AsyncClient(timeout=10.0) as client:
             holdings_response = await client.get(f"{JAVA_BACKEND_URL}/api/holdings")
             holdings_response.raise_for_status()
             holdings = holdings_response.json()
-        
+
         if not holdings:
             return {
                 "insights": [
-                    "📊 Your portfolio is empty. Start by adding assets to get personalized AI insights!",
-                    "💡 Consider diversifying across stocks, bonds, crypto, and cash for better risk management.",
-                    "📈 Add your first asset using the 'Add Asset' button to begin tracking your investments."
+                    "📊 Your portfolio is empty.",
+                    "Add assets to get AI insights."
                 ]
             }
-        
-        # Fetch current prices for all holdings
+
         symbols = [h["asset"]["symbol"] for h in holdings]
-        prices_data = {}
-        if symbols:
-            prices_response = await client.post(
-                f"http://127.0.0.1:8000/prices",
-                json=symbols,
-                headers={"Content-Type": "application/json"}
-            )
-            if prices_response.status_code == 200:
-                prices_data = prices_response.json()
-        
-        # Build portfolio summary
+
+        # ✅ Direct call, no HTTP
+        prices_data = get_prices(symbols)
+
         portfolio_summary = build_portfolio_summary(holdings, prices_data)
-        
-        # Generate AI insights using Gemini
-        insights = await generate_insights_with_gemini(portfolio_summary, holdings, prices_data)
-        
+
+        insights = await generate_insights_with_gemini(
+            portfolio_summary,
+            holdings,
+            prices_data
+        )
+
         return {"insights": insights}
-        
-    except httpx.RequestError as e:
-        print(f"Error fetching holdings: {e}")
-        return {
-            "insights": [
-                "⚠️ Unable to fetch portfolio data. Please ensure the backend is running.",
-                "Check that the Java backend service is accessible at http://127.0.0.1:8080"
-            ]
-        }
+
     except Exception as e:
         print(f"Error generating insights: {e}")
         return {
             "insights": [
-                "⚠️ Error generating AI insights. Please try again later.",
-                f"Error details: {str(e)}"
+                "⚠️ Error generating AI insights.",
+                str(e)
             ]
         }
 
@@ -190,7 +184,6 @@ def build_portfolio_summary(holdings, prices_data):
 async def generate_insights_with_gemini(portfolio_summary, holdings, prices_data):
     """Generate AI insights using Gemini API."""
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Build context prompt
         prompt = f"""You are an expert financial advisor AI assistant. Analyze the following portfolio data and provide 3-5 concise, actionable insights (each should be 1-2 sentences max). Focus on:
@@ -239,7 +232,9 @@ Example format:
 
 Return ONLY the JSON array, no additional text."""
         
-        response = model.generate_content(prompt)
+        response=client.models.generate_content(model='gemini-2.5-flash', 
+    contents=prompt)
+        #response = model.generate_content(prompt)
         
         # Parse response
         response_text = response.text.strip()
@@ -280,3 +275,7 @@ Return ONLY the JSON array, no additional text."""
             "📊 Review your portfolio allocation and consider diversification.",
             "💡 Monitor your holdings regularly for optimal performance."
         ]
+
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}

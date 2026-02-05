@@ -1,7 +1,7 @@
 const API_URL = "http://127.0.0.1:8000/prices";
-const HOLDINGS_API = "http://127.0.0.1:8080/api/holdings";
-const ALERTS_API = "http://127.0.0.1:8080/api/alerts";
-const NOTIFICATIONS_API = "http://127.0.0.1:8080/api/notifications";
+const HOLDINGS_API = "http://127.0.0.1:8082/api/holdings";
+const ALERTS_API = "http://127.0.0.1:8082/api/alerts";
+const NOTIFICATIONS_API = "http://127.0.0.1:8082/api/notifications";
 const AI_INSIGHTS_API = "http://127.0.0.1:8000/ai-insights";
 const REFRESH_INTERVAL = 15000;
 const AI_INSIGHTS_REFRESH_INTERVAL = 300000; // 5 minutes
@@ -658,7 +658,7 @@ async function sellAsset() {
       quantity: quantity
     };
     
-    const res = await fetch("http://127.0.0.1:8080/api/holdings/sell", {
+    const res = await fetch("http://127.0.0.1:8082/api/holdings/sell", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -683,7 +683,7 @@ async function sellAsset() {
 /* ============================= */
 async function loadAssetsFromDatabase() {
   try {
-    const res = await fetch("http://127.0.0.1:8080/api/assets");
+    const res = await fetch("http://127.0.0.1:8082/api/assets");
     const assets = await res.json();
     
     // Store assets globally for use in updateAssetOptions
@@ -825,7 +825,7 @@ async function saveAsset() {
   };
 
   try {
-    const res = await fetch("http://127.0.0.1:8080/api/transactions/buy", {
+    const res = await fetch("http://127.0.0.1:8082/api/transactions/buy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -854,7 +854,7 @@ async function saveAsset() {
 async function saveAlertForAsset(symbol) {
   try {
     // Get asset ID from symbol
-    const assetsRes = await fetch("http://127.0.0.1:8080/api/assets");
+    const assetsRes = await fetch("http://127.0.0.1:8082/api/assets");
     const assets = await assetsRes.json();
     const asset = assets.find(a => a.symbol === symbol);
     
@@ -1212,11 +1212,11 @@ async function openSetAlertModalForAsset(symbol) {
 }
 
 // Update the existing loadHoldings function to include alert buttons
-const originalLoadHoldings = loadHoldings;
-loadHoldings = async function() {
-  await originalLoadHoldings();
-  setTimeout(updateHoldingsTableWithAlerts, 100);
-};
+// const originalLoadHoldings = loadHoldings;
+// loadHoldings = async function() {
+//   await originalLoadHoldings();
+//   setTimeout(updateHoldingsTableWithAlerts, 100);
+// };
 
 async function toggleAlertForAsset(symbol) {
   const button = document.getElementById(`alert-btn-${symbol}`);
@@ -1232,7 +1232,7 @@ async function toggleAlertForAsset(symbol) {
 async function stopAlertForAsset(symbol) {
   try {
     // Get asset ID from symbol
-    const assetsRes = await fetch("http://127.0.0.1:8080/api/assets");
+    const assetsRes = await fetch("http://127.0.0.1:8082/api/assets");
     const assets = await assetsRes.json();
     const asset = assets.find(a => a.symbol === symbol);
 
@@ -1241,7 +1241,7 @@ async function stopAlertForAsset(symbol) {
       return;
     }
 
-    const res = await fetch(`http://127.0.0.1:8080/api/alerts/asset/${asset.id}`, {
+    const res = await fetch(`http://127.0.0.1:8082/api/alerts/asset/${asset.id}`, {
       method: 'DELETE'
     });
 
@@ -1272,7 +1272,7 @@ function updateAlertButton(symbol, hasAlert) {
 
 async function updateAlertButtons() {
   try {
-    const res = await fetch("http://127.0.0.1:8080/api/alerts");
+    const res = await fetch("http://127.0.0.1:8082/api/alerts");
     const alerts = await res.json();
 
     const activeAlertSymbols = alerts.map(alert => alert.asset.symbol);
@@ -1293,7 +1293,7 @@ setInterval(updateNotificationBadge, 30000);
 // Debug function to test alert evaluation
 async function testAlertEvaluation() {
   try {
-    const res = await fetch("http://127.0.0.1:8080/api/alerts/test-evaluation", {
+    const res = await fetch("http://127.0.0.1:8082/api/alerts/test-evaluation", {
       method: 'POST'
     });
     
