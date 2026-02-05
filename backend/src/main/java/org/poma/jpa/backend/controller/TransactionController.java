@@ -2,6 +2,7 @@ package org.poma.jpa.backend.controller;
 
 import org.poma.jpa.backend.dto.SellRequest;
 import org.poma.jpa.backend.dto.TransactionRequest;
+import org.poma.jpa.backend.dto.TransactionSummaryDto;
 import org.poma.jpa.backend.entity.Transactions;
 import org.poma.jpa.backend.service.TransactionService;
 import org.springframework.http.ResponseEntity;
@@ -33,4 +34,9 @@ public class TransactionController {
     ) {
         return ResponseEntity.ok(service.sell(req));
     }
+    @GetMapping("/summary")
+    public ResponseEntity<TransactionSummaryDto> getSummary() {
+        return ResponseEntity.ok(service.getSummary());
+    }
+
 }
