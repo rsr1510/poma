@@ -314,17 +314,14 @@
 
       <aside class="ai-panel">
         <h3>AI Insights</h3>
-        <div class="ai-card">
-          Your equity exposure is high; consider partial profit booking to
-          reduce tax impact.
-        </div><!--SELL_MODAL_PLACEHOLDER-->
-        <div class="ai-card">
-          TCS has outperformed its sector benchmark by 6.2% this quarter.
-        </div><!--SELL_MODAL_PLACEHOLDER-->
-        <div class="ai-card">
-          High short-term gains detected — holding longer could reduce capital
-          gains tax.
-        </div><!--SELL_MODAL_PLACEHOLDER-->
+        <div id="aiInsightsContainer">
+          <div class="ai-card">
+            <div class="ai-loading">Loading insights...</div>
+          </div>
+        </div>
+        <button class="refresh-insights-btn" onclick="loadAIInsights()" title="Refresh insights">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
       </aside>
     </div><!--SELL_MODAL_PLACEHOLDER-->
 
