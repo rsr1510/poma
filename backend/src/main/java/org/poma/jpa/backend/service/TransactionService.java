@@ -11,6 +11,7 @@ import org.poma.jpa.backend.repo.UserRepo;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @Transactional
@@ -118,6 +119,10 @@ public class TransactionService {
         }
 
         return tx;
+
+    }
+    public List<Transactions> getAllTransactions() {
+        return repo.findAll();
     }
 }*/
 package org.poma.jpa.backend.service;
