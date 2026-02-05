@@ -29,11 +29,11 @@ load_dotenv()  # loads .env into os.environ
 # if GEMINI_API_KEY:
 #     genai.configure(api_key=GEMINI_API_KEY)
 # print("Gemini key loaded:", bool(GEMINI_API_KEY))
-GEMINI_API_KEY="AIzaSyB2WlEFahnHcKVRyYhaW28p8h94TmniZyc"
+GEMINI_API_KEY="AIzaSyBd-LpVWacNXjSo32_2nsQ1uwMdDcYbAh8"
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 # Java Backend URL
-JAVA_BACKEND_URL = "http://127.0.0.1:8082"
+JAVA_BACKEND_URL = "http://127.0.0.1:8080"
 
 @app.post("/prices")
 def get_prices(symbols: List[str]):

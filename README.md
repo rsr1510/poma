@@ -28,7 +28,7 @@ A comprehensive portfolio management application with AI-powered insights.
    ```bash
    ./mvnw spring-boot:run
    ```
-   The backend will run on `http://127.0.0.1:8082`
+   The backend will run on `http://127.0.0.1:8080`
 
 ### Price Service Setup (Python FastAPI)
 
