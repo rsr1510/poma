@@ -261,32 +261,21 @@
           </div><!--SELL_MODAL_PLACEHOLDER-->
         </div><!--SELL_MODAL_PLACEHOLDER-->
 
-        <div class="card">
+          <div class="card">
           <h3>Tax & Fees Tracker</h3>
-          <table>
+            <table>
+            <tr><td>Total Invested</td><td id="taxTotalInvested">₹0</td></tr>
+            <tr><td>Total Profit</td><td id="taxTotalProfit">₹0</td></tr>
+            <tr><td>Total Fees</td><td id="taxTotalFees">₹0</td></tr>
+            <tr><td>Estimated Tax (15%)</td><td id="taxEstimated">₹0</td></tr>
             <tr>
-              <td>Total Invested Amount</td>
-              <td>₹2,20,000</td>
-            </tr>
-            <tr>
-              <td>Total Profit Earned</td>
-              <td class="positive">₹26,900</td>
-            </tr>
-            <tr>
-              <td>Brokerage & Platform Fees</td>
-              <td>₹1,450</td>
-            </tr>
-            <tr>
-              <td>Estimated Capital Gains Tax (15%)</td>
-              <td>₹4,035</td>
-            </tr>
-            <tr>
-              <td><strong>Net Profit After Fees & Tax</strong></td>
-              <td class="positive"><strong>₹21,415</strong></td>
-            </tr>
-          </table>
-        </div><!--SELL_MODAL_PLACEHOLDER-->
-      </div><!--SELL_MODAL_PLACEHOLDER-->
+            <td><strong>Net Profit</strong></td>
+            <td id="taxNetProfit"><strong>₹0</strong></td>
+           </tr>
+            </table>
+          </div>
+
+        </div>
 
       <div id="holdings-view" class="view">
         <div class="card">
@@ -342,21 +331,18 @@
       </div><!--SELL_MODAL_PLACEHOLDER-->
     </main>
 
-    <aside class="ai-panel">
-      <h3>AI Insights</h3>
-      <div class="ai-card">
-        Your equity exposure is high; consider partial profit booking to
-        reduce tax impact.
-      </div><!--SELL_MODAL_PLACEHOLDER-->
-      <div class="ai-card">
-        TCS has outperformed its sector benchmark by 6.2% this quarter.
-      </div><!--SELL_MODAL_PLACEHOLDER-->
-      <div class="ai-card">
-        High short-term gains detected — holding longer could reduce capital
-        gains tax.
-      </div><!--SELL_MODAL_PLACEHOLDER-->
-    </aside>
-  </div><!--SELL_MODAL_PLACEHOLDER-->
+      <aside class="ai-panel">
+        <h3>AI Insights</h3>
+        <div id="aiInsightsContainer">
+          <div class="ai-card">
+            <div class="ai-loading">Loading insights...</div>
+          </div>
+        </div>
+        <button class="refresh-insights-btn" onclick="loadAIInsights()" title="Refresh insights">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+      </aside>
+    </div><!--SELL_MODAL_PLACEHOLDER-->
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="charts.js"></script>
