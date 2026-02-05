@@ -24,6 +24,8 @@
 .notification-meta{display:flex;justify-content:space-between;font-size:11px;color:#64748b}
 .notification-time{color:#94a3b8}
 .notification-price{color:#22c55e;font-weight:600}
+.notification-price.positive{color:#22c55e;font-weight:600}
+.notification-price.negative{color:#ef4444;font-weight:600}
 .mark-read-btn{background:#2563eb;color:#fff;border:none;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;margin-top:8px}
 .mark-read-btn:hover{background:#1d4ed8}
 .delete-btn{background:#dc2626;color:#fff;border:none;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;margin-top:8px;margin-left:8px}
@@ -44,8 +46,10 @@
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* Alert Button */
-.alert-btn{background:#f59e0b;color:#fff;border:none;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;white-space:nowrap}
+.alert-btn{background:#f59e0b;color:#fff;border:none;font-size:11px;padding:4px 8px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:background-color 0.2s}
 .alert-btn:hover{background:#d97706}
+.alert-btn.stop-alert{background:#6b7280}
+.alert-btn.stop-alert:hover{background:#4b5563}
 
 /* Price Alert Section */
 .price-alert-section{margin-top:15px;padding:12px;background:#020617;border:1px solid #1e293b;border-radius:4px}

@@ -179,13 +179,14 @@ async function loadHoldings() {
         <td class="current-price">Loading...</td>
         <td class="market-value">Loading...</td>
         <td class="pl">Loading...</td>
-        <td><button class="alert-btn" onclick="openSetAlertModalForAsset('${symbol}')">Set Alert</button></td>
+        <td><button class="alert-btn" id="alert-btn-${symbol}" onclick="toggleAlertForAsset('${symbol}')">Set Alert</button></td>
       `;
 
       tbody.appendChild(row);
     });
 
     updatePrices();
+    updateAlertButtons();
   } catch (err) {
     console.error("Error loading holdings:", err);
   }
@@ -921,12 +922,16 @@ async function saveAlert() {
     return;
   }
 
+  console.log("Creating alert:", { assetId, thresholdPrice, condition });
+
   try {
     const payload = {
       assetId: parseInt(assetId),
       thresholdPrice: thresholdPrice,
       condition: condition
     };
+    
+    console.log("Alert payload:", payload);
     
     const res = await fetch(ALERTS_API, {
       method: "POST",
@@ -937,13 +942,17 @@ async function saveAlert() {
     if (!res.ok) {
       throw new Error("Alert creation failed!");
     }
-    
-    alert("✅ Alert Set Successfully!");
+
+    const createdAlert = await res.json();
+    console.log("Alert created successfully:", createdAlert);
+
+    alert("Alert Set Successfully!");
     closeSetAlertModal();
+    updateAlertButtons(); // Add this line
     
   } catch (err) {
     console.error("Error setting alert:", err);
-    alert("❌ Error setting alert!");
+    alert("Error setting alert!");
   }
 }
 
@@ -977,6 +986,9 @@ async function loadNotifications() {
     
     notifications.forEach(notification => {
       const profitLoss = getProfitLossForAsset(notification.asset.symbol);
+      const isProfit = profitLoss >= 0;
+      const profitLossClass = isProfit ? 'positive' : 'negative';
+
       const notificationEl = document.createElement("div");
       notificationEl.className = `notification-item ${!notification.isRead ? 'unread' : ''}`;
       notificationEl.innerHTML = `
@@ -984,7 +996,7 @@ async function loadNotifications() {
           <div class="notification-message">${notification.message}</div>
           <div class="notification-meta">
             <span class="notification-time">${new Date(notification.createdAt).toLocaleString()}</span>
-            <span class="notification-price">P/L: ${formatINR(profitLoss)}</span>
+            <span class="notification-price ${profitLossClass}">P/L: ${formatINR(profitLoss)}</span>
           </div>
         </div>
         <div class="notification-actions">
@@ -1099,16 +1111,22 @@ function getProfitLossForAsset(symbol) {
 
 // WebSocket or polling for new notifications
 let lastNotificationCount = 0;
+let lastNotificationIds = new Set();
 async function checkForNewNotifications() {
   try {
     const res = await fetch(`${NOTIFICATIONS_API}/unread`);
     const notifications = await res.json();
     
-    if (notifications.length > lastNotificationCount) {
-      // New notification received - show popup
-      const latestNotification = notifications[0];
-      showNotificationPopup(latestNotification);
-      lastNotificationCount = notifications.length;
+    // Check for new notifications by comparing IDs
+    const currentNotificationIds = new Set(notifications.map(n => n.id));
+    const newNotifications = notifications.filter(n => !lastNotificationIds.has(n.id));
+    
+    if (newNotifications.length > 0) {
+      // Show popup for each new notification
+      newNotifications.forEach(notification => {
+        showNotificationPopup(notification);
+      });
+      lastNotificationIds = currentNotificationIds;
     }
     
     updateNotificationBadge();
@@ -1119,10 +1137,19 @@ async function checkForNewNotifications() {
 
 function showNotificationPopup(notification) {
   const profitLoss = getProfitLossForAsset(notification.asset.symbol);
+  const isProfit = profitLoss >= 0;
+  const profitLossClass = isProfit ? 'positive' : 'negative';
   
   // Create popup element
   const popup = document.createElement("div");
   popup.className = "notification-popup";
+  
+  // Calculate position for multiple popups
+  const existingPopups = document.querySelectorAll('.notification-popup');
+  const offset = existingPopups.length * 120; // Stack popups vertically
+  
+  popup.style.top = `${80 + offset}px`;
+  
   popup.innerHTML = `
     <div class="popup-content">
       <div class="popup-header">
@@ -1132,7 +1159,7 @@ function showNotificationPopup(notification) {
       <div class="popup-body">
         <p>${notification.message}</p>
         <div class="popup-meta">
-          <span>P/L: ${formatINR(profitLoss)}</span>
+          <span class="${profitLossClass}">P/L: ${formatINR(profitLoss)}</span>
           <span>${new Date(notification.createdAt).toLocaleString()}</span>
         </div>
       </div>
@@ -1144,8 +1171,17 @@ function showNotificationPopup(notification) {
   setTimeout(() => {
     if (popup.parentElement) {
       popup.remove();
+      // Reposition remaining popups
+      repositionPopups();
     }
   }, 5000);
+}
+
+function repositionPopups() {
+  const popups = document.querySelectorAll('.notification-popup');
+  popups.forEach((popup, index) => {
+    popup.style.top = `${80 + (index * 120)}px`;
+  });
 }
 
 // Check for new notifications every 10 seconds
@@ -1176,5 +1212,101 @@ loadHoldings = async function() {
   setTimeout(updateHoldingsTableWithAlerts, 100);
 };
 
+async function toggleAlertForAsset(symbol) {
+  const button = document.getElementById(`alert-btn-${symbol}`);
+
+  if (button.textContent === 'Set Alert') {
+    openSetAlertModalForAsset(symbol);
+  } else {
+    // Stop the alert
+    await stopAlertForAsset(symbol);
+  }
+}
+
+async function stopAlertForAsset(symbol) {
+  try {
+    // Get asset ID from symbol
+    const assetsRes = await fetch("http://127.0.0.1:8080/api/assets");
+    const assets = await assetsRes.json();
+    const asset = assets.find(a => a.symbol === symbol);
+
+    if (!asset) {
+      console.error("Asset not found for symbol:", symbol);
+      return;
+    }
+
+    const res = await fetch(`http://127.0.0.1:8080/api/alerts/asset/${asset.id}`, {
+      method: 'DELETE'
+    });
+
+    if (res.ok) {
+      updateAlertButton(symbol, false);
+      alert("✅ Alert Stopped Successfully!");
+    }
+  } catch (err) {
+    console.error("Error stopping alert:", err);
+    alert("❌ Error stopping alert!");
+  }
+}
+
+function updateAlertButton(symbol, hasAlert) {
+  const button = document.getElementById(`alert-btn-${symbol}`);
+  if (button) {
+    if (hasAlert) {
+      button.textContent = 'Stop Alert';
+      button.style.backgroundColor = '#6b7280'; // Grey color
+      button.style.hover = '#4b5563';
+    } else {
+      button.textContent = 'Set Alert';
+      button.style.backgroundColor = '#f59e0b'; // Orange color
+      button.style.hover = '#d97706';
+    }
+  }
+}
+
+async function updateAlertButtons() {
+  try {
+    const res = await fetch("http://127.0.0.1:8080/api/alerts");
+    const alerts = await res.json();
+
+    const activeAlertSymbols = alerts.map(alert => alert.asset.symbol);
+
+    // Update all alert buttons
+    document.querySelectorAll('.alert-btn').forEach(btn => {
+      const symbol = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+      updateAlertButton(symbol, activeAlertSymbols.includes(symbol));
+    });
+  } catch (err) {
+    console.error("Error updating alert buttons:", err);
+  }
+}
+
 // Periodically update notification badge
 setInterval(updateNotificationBadge, 30000);
+
+// Debug function to test alert evaluation
+async function testAlertEvaluation() {
+  try {
+    const res = await fetch("http://127.0.0.1:8080/api/alerts/test-evaluation", {
+      method: 'POST'
+    });
+    
+    if (res.ok) {
+      const result = await res.text();
+      console.log("Alert evaluation test result:", result);
+      alert("Alert evaluation triggered! Check console for details.");
+      // Refresh notifications after testing
+      setTimeout(() => {
+        loadNotifications();
+        updateNotificationBadge();
+      }, 2000);
+    } else {
+      const error = await res.text();
+      console.error("Alert evaluation test failed:", error);
+      alert("Test failed: " + error);
+    }
+  } catch (err) {
+    console.error("Error testing alert evaluation:", err);
+    alert("Error testing alert evaluation!");
+  }
+}

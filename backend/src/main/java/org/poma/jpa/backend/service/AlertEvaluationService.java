@@ -76,6 +76,14 @@ public class AlertEvaluationService {
             alert.getId(), asset.getSymbol(), currentPrice, alert.getThresholdPrice(), alert.getCondition(), conditionMet);
         
         if (conditionMet) {
+            // For BELOW alerts, always notify if condition is met (simpler logic)
+            if (alert.getCondition() == PriceAlert.AlertCondition.BELOW) {
+                logger.info("BELOW alert condition met for {} - Creating notification", asset.getSymbol());
+                createNotification(alert, currentPrice);
+                updateAlertTriggered(alert);
+                return;
+            }
+            
             logger.info("Alert condition met for {} - Current: {}, Threshold: {}, Condition: {}", 
                 asset.getSymbol(), currentPrice, alert.getThresholdPrice(), alert.getCondition());
             
@@ -127,12 +135,20 @@ public class AlertEvaluationService {
     private boolean checkCondition(PriceAlert alert, BigDecimal currentPrice) {
         BigDecimal thresholdPrice = alert.getThresholdPrice();
         
+        logger.debug("Checking condition for {} - Current: {}, Threshold: {}, Condition: {}", 
+            alert.getAsset().getSymbol(), currentPrice, thresholdPrice, alert.getCondition());
+        
         switch (alert.getCondition()) {
             case ABOVE:
-                return currentPrice.compareTo(thresholdPrice) > 0;
+                boolean aboveResult = currentPrice.compareTo(thresholdPrice) > 0;
+                logger.debug("ABOVE condition result: {} > {} = {}", currentPrice, thresholdPrice, aboveResult);
+                return aboveResult;
             case BELOW:
-                return currentPrice.compareTo(thresholdPrice) < 0;
+                boolean belowResult = currentPrice.compareTo(thresholdPrice) < 0;
+                logger.debug("BELOW condition result: {} < {} = {}", currentPrice, thresholdPrice, belowResult);
+                return belowResult;
             default:
+                logger.warn("Unknown alert condition: {}", alert.getCondition());
                 return false;
         }
     }

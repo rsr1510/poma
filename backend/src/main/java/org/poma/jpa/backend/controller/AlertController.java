@@ -1,7 +1,11 @@
 package org.poma.jpa.backend.controller;
 
 import org.poma.jpa.backend.dto.AlertRequest;
+import org.poma.jpa.backend.entity.Assets;
 import org.poma.jpa.backend.entity.PriceAlert;
+import org.poma.jpa.backend.repo.AssetRepo;
+import org.poma.jpa.backend.repo.PriceAlertRepo;
+import org.poma.jpa.backend.service.AlertEvaluationService;
 import org.poma.jpa.backend.service.AlertService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +18,15 @@ import java.util.List;
 public class AlertController {
 
     private final AlertService alertService;
+    private final PriceAlertRepo priceAlertRepo;
+    private final AssetRepo assetRepo;
+    private final AlertEvaluationService alertEvaluationService;
 
-    public AlertController(AlertService alertService) {
+    public AlertController(AlertService alertService, PriceAlertRepo priceAlertRepo, AssetRepo assetRepo, AlertEvaluationService alertEvaluationService) {
         this.alertService = alertService;
+        this.priceAlertRepo = priceAlertRepo;
+        this.assetRepo = assetRepo;
+        this.alertEvaluationService = alertEvaluationService;
     }
 
     @PostMapping
@@ -78,6 +88,27 @@ public class AlertController {
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/asset/{assetId}")
+    public ResponseEntity<Void> deleteAlertsByAsset(@PathVariable Long assetId) {
+        Assets asset = assetRepo.findById(assetId)
+            .orElseThrow(() -> new RuntimeException("Asset not found"));
+        
+        List<PriceAlert> alerts = priceAlertRepo.findByAsset(asset);
+        priceAlertRepo.deleteAll(alerts);
+        
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/test-evaluation")
+    public ResponseEntity<String> testAlertEvaluation() {
+        try {
+            alertEvaluationService.evaluateAlerts();
+            return ResponseEntity.ok("Alert evaluation triggered successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
 }
