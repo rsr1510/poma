@@ -29,7 +29,7 @@ load_dotenv()  # loads .env into os.environ
 # if GEMINI_API_KEY:
 #     genai.configure(api_key=GEMINI_API_KEY)
 # print("Gemini key loaded:", bool(GEMINI_API_KEY))
-GEMINI_API_KEY="AIzaSyBd-LpVWacNXjSo32_2nsQ1uwMdDcYbAh8"
+GEMINI_API_KEY="your_api_key"
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 # Java Backend URL
