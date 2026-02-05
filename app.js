@@ -2,7 +2,9 @@ const API_URL = "http://127.0.0.1:8000/prices";
 const HOLDINGS_API = "http://127.0.0.1:8080/api/holdings";
 const ALERTS_API = "http://127.0.0.1:8080/api/alerts";
 const NOTIFICATIONS_API = "http://127.0.0.1:8080/api/notifications";
+const AI_INSIGHTS_API = "http://127.0.0.1:8000/ai-insights";
 const REFRESH_INTERVAL = 15000;
+const AI_INSIGHTS_REFRESH_INTERVAL = 300000; // 5 minutes
 
 let topStocks = [
   { name: "Reliance Industries", symbol: "RELIANCE.NS" },
@@ -761,7 +763,11 @@ window.addEventListener("load", () => {
   loadHoldings();
   loadNotifications();
   updateNotificationBadge();
+  loadAIInsights();
 });
+
+// Periodically refresh AI insights
+setInterval(loadAIInsights, AI_INSIGHTS_REFRESH_INTERVAL);
 
 /* ============================= */
 /* Price Alert Functions */
@@ -1309,4 +1315,69 @@ async function testAlertEvaluation() {
     console.error("Error testing alert evaluation:", err);
     alert("Error testing alert evaluation!");
   }
+}
+
+/* ============================= */
+/* AI Insights Functions */
+/* ============================= */
+async function loadAIInsights() {
+  try {
+    const container = document.getElementById("aiInsightsContainer");
+    
+    // Show loading state
+    container.innerHTML = `
+      <div class="ai-card">
+        <div class="ai-loading">
+          <i class="fas fa-spinner fa-spin"></i> Generating insights...
+        </div>
+      </div>
+    `;
+    
+    const res = await fetch(AI_INSIGHTS_API);
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
+    const data = await res.json();
+    const insights = data.insights || [];
+    
+    // Clear container
+    container.innerHTML = "";
+    
+    if (insights.length === 0) {
+      container.innerHTML = `
+        <div class="ai-card">
+          <div class="ai-loading">No insights available at the moment.</div>
+        </div>
+      `;
+      return;
+    }
+    
+    // Display insights
+    insights.forEach((insight) => {
+      const card = document.createElement("div");
+      card.className = "ai-card";
+      card.innerHTML = `<div class="ai-insight-text">${escapeHtml(insight)}</div>`;
+      container.appendChild(card);
+    });
+    
+  } catch (err) {
+    console.error("Error loading AI insights:", err);
+    const container = document.getElementById("aiInsightsContainer");
+    container.innerHTML = `
+      <div class="ai-card">
+        <div class="ai-error">
+          <i class="fas fa-exclamation-triangle"></i> 
+          Unable to load AI insights. Please check your connection and try again.
+        </div>
+      </div>
+    `;
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
 }
