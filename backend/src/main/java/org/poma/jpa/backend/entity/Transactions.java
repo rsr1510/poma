@@ -118,4 +118,8 @@ public class Transactions {
     public LocalDateTime getTransactionDate() {
         return transactionDate;
     }
+
+    public void setTransactionDate(LocalDateTime transactionDate) {
+        this.transactionDate = transactionDate;
+    }
 }

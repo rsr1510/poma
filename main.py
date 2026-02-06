@@ -29,7 +29,8 @@ load_dotenv()  # loads .env into os.environ
 # if GEMINI_API_KEY:
 #     genai.configure(api_key=GEMINI_API_KEY)
 # print("Gemini key loaded:", bool(GEMINI_API_KEY))
-GEMINI_API_KEY="AIzaSyBd-LpVWacNXjSo32_2nsQ1uwMdDcYbAh8"
+GEMINI_API_KEY="your api key here"
+
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 # Java Backend URL
@@ -63,7 +64,7 @@ async def get_ai_insights():
     if not GEMINI_API_KEY:
         return {
             "insights": [
-                "⚠️ Gemini API key not configured.",
+                "Gemini API key not configured.",
                 "Set GEMINI_API_KEY in environment variables."
             ]
         }
@@ -77,7 +78,7 @@ async def get_ai_insights():
         if not holdings:
             return {
                 "insights": [
-                    "📊 Your portfolio is empty.",
+                    " Your portfolio is empty.",
                     "Add assets to get AI insights."
                 ]
             }
@@ -101,7 +102,7 @@ async def get_ai_insights():
         print(f"Error generating insights: {e}")
         return {
             "insights": [
-                "⚠️ Error generating AI insights.",
+                "Error generating AI insights.",
                 str(e)
             ]
         }
@@ -262,18 +263,18 @@ Return ONLY the JSON array, no additional text."""
         
         # Ultimate fallback
         return [
-            "📊 Portfolio analysis complete. Review your asset allocation regularly.",
-            "💡 Consider rebalancing if any asset class exceeds 40% of your portfolio.",
-            "📈 Monitor market trends and news related to your top holdings."
+            "Portfolio analysis complete. Review your asset allocation regularly.",
+            "Consider rebalancing if any asset class exceeds 40% of your portfolio.",
+            "Monitor market trends and news related to your top holdings."
         ]
         
     except Exception as e:
         print(f"Error calling Gemini API: {e}")
         # Return fallback insights
         return [
-            f"⚠️ AI insight generation encountered an issue: {str(e)}",
-            "📊 Review your portfolio allocation and consider diversification.",
-            "💡 Monitor your holdings regularly for optimal performance."
+            f"AI insight generation encountered an issue: {str(e)}",
+            "Review your portfolio allocation and consider diversification.",
+            "Monitor your holdings regularly for optimal performance."
         ]
 
 @app.get("/ping")

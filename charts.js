@@ -4,7 +4,7 @@ Chart.defaults.font.family = "Inter";
 new Chart(document.getElementById("allocationChart"),{
   type:"doughnut",
   data:{
-    labels:["Stocks","Mutual Funds","Crypto","Cash"],
+    labels:["Stocks","Bonds","Crypto","Cash"],
     datasets:[{
       data:[60,20,10,10],
       backgroundColor:["#2563eb","#22c55e","#eab308","#94a3b8"],

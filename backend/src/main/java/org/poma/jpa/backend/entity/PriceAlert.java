@@ -86,6 +86,10 @@ public class PriceAlert {
         return createdAt;
     }
 
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public LocalDateTime getLastTriggeredAt() {
         return lastTriggeredAt;
     }

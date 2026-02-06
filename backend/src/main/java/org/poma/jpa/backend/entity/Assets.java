@@ -111,10 +111,3 @@ public class Assets {
         return Objects.hashCode(id);
     }
 }
-
-enum AssetType {
-    STOCK,
-    BOND,
-    CRYPTO,
-    CASH
-}
