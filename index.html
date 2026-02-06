@@ -9,88 +9,107 @@
   </head>
     <!-- ADD ASSET POPUP -->
   <div id="assetModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content wide-modal">
+      <div class="modal-header-wrapper">
+        <h3>Add Asset</h3>
+      </div>
 
-      <h3>Add Asset</h3>
+      <div class="modal-body">
+        <!-- LEFT COLUMN: Dropdowns and inputs -->
+        <div class="modal-left-col">
+          <div class="modal-field">
+            <label>Asset Type</label>
+            <select id="assetType" onchange="updateAssetOptions()">
+              <option value="">Select asset type</option>
+              <option value="stock">Stock</option>
+              <option value="crypto">Crypto</option>
+              <option value="bonds">Bonds</option>
+              <option value="cash">Cash</option>
+            </select>
+          </div>
 
-      <!-- Asset Type -->
-      <label>Asset Type</label>
-      <select id="assetType" onchange="updateAssetOptions()">
-        <option value="">Select asset type</option>
-        <option value="stock">Stock</option>
-        <option value="crypto">Crypto</option>
-        <option value="bonds">Bonds</option>
-        <option value="cash">Cash</option>
-      </select>
+          <div class="modal-field">
+            <label>Asset Category</label>
+            <select id="assetCategory">
+              <option value="">Select asset type first</option>
+            </select>
+          </div>
 
-      <!-- Dynamic second dropdown -->
-      <label>Asset Category</label>
-      <select id="assetCategory">
-        <option value="">Select asset type first</option>
-      </select>
+          <div class="modal-field">
+            <label>Platform</label>
+            <select id="platform" onchange="updateFees()"></select>
+          </div>
 
-      <!-- Platform -->
-      <label>Platform</label>
-      <select id="platform" onchange="updateFees()"></select>
+          <div class="modal-field">
+            <label>Units</label>
+            <input id="units" type="number" placeholder="Enter units" oninput="updateBill()">
+          </div>
 
-      <!-- Units -->
-      <label>Units</label>
-      <input id="units" type="number" placeholder="Enter units" oninput="updateBill()">
+          <div class="modal-field">
+            <label>Price per Unit (₹)</label>
+            <input id="pricePerUnit" type="number" placeholder="Enter price per unit" oninput="updateBill()">
+          </div>
+        </div>
 
-      <!-- Price per Unit -->
-      <label>Price per Unit (₹)</label>
-      <input id="pricePerUnit" type="number" placeholder="Enter price per unit" oninput="updateBill()">
+        <!-- RIGHT COLUMN: Platform Fees and Alerts -->
+        <div class="modal-right-col">
+          <!-- Platform Fees Details -->
+          <div class="platform-fees">
+            <h4>Platform Fees</h4>
+            <div id="platformFeeDetails">Select a platform to view fees</div>
+          </div>
 
-      <!-- Transaction Summary -->
-      <div class="bill">
-        <h4>Transaction Summary</h4>
-        <div class="bill-row">
-          <span>Total Investment:</span>
-          <span id="totalInvestment">₹0</span>
-        </div><!--SELL_MODAL_PLACEHOLDER-->
-        <div class="bill-row">
-          <span>Fees:</span>
-          <span id="fees">₹0</span>
-        </div><!--SELL_MODAL_PLACEHOLDER-->
-        <div class="bill-row total">
-          <span>Total Cost:</span>
-          <span id="totalCost">₹0</span>
-        </div><!--SELL_MODAL_PLACEHOLDER-->
-      </div><!--SELL_MODAL_PLACEHOLDER-->
+          <!-- Price Alert Section -->
+          <div class="price-alert-box">
+            <label class="checkbox-label">
+              <input type="checkbox" id="enableAlert" onchange="toggleAlertFields()">
+              <span>Enable Price Alert</span>
+            </label>
+            
+            <div id="alertFields" style="display: none; margin-top: 10px;">
+              <div class="modal-field">
+                <label>Alert Condition</label>
+                <select id="alertCondition">
+                  <option value="BELOW">Below Threshold</option>
+                  <option value="ABOVE">Above Threshold</option>
+                </select>
+              </div>
+              
+              <div class="modal-field">
+                <label>Threshold Price (₹)</label>
+                <input id="thresholdPrice" type="number" placeholder="Enter threshold price" step="0.01">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- Platform Fees Details -->
-      <div class="platform-fees">
-        <h4>Platform Fees</h4>
-        <div id="platformFeeDetails">Select a platform to view fees</div>
-      </div><!--SELL_MODAL_PLACEHOLDER-->
-
-      <!-- Price Alert Section -->
-      <div class="price-alert-section">
-        <label>
-          <input type="checkbox" id="enableAlert" onchange="toggleAlertFields()">
-          Enable Price Alert
-        </label>
-        
-        <div id="alertFields" style="display: none;">
-          <label>Alert Condition</label>
-          <select id="alertCondition">
-            <option value="BELOW">Below Threshold</option>
-            <option value="ABOVE">Above Threshold</option>
-          </select>
-          
-          <label>Threshold Price (₹)</label>
-          <input id="thresholdPrice" type="number" placeholder="Enter threshold price" step="0.01">
+      <!-- BOTTOM: Transaction Summary (Full Width) -->
+      <div class="modal-bottom">
+        <div class="bill">
+          <h4>Transaction Summary</h4>
+          <div class="bill-row">
+            <span>Total Investment:</span>
+            <span id="totalInvestment">₹0</span>
+          </div>
+          <div class="bill-row">
+            <span>Fees:</span>
+            <span id="fees">₹0</span>
+          </div>
+          <div class="bill-row total">
+            <span>Total Cost:</span>
+            <span id="totalCost">₹0</span>
+          </div>
         </div>
       </div>
 
       <div class="modal-actions">
         <button class="secondary" onclick="closeAssetModal()">Cancel</button>
         <button class="primary" onclick="saveAsset()">Save</button>
+      </div>
 
-      </div><!--SELL_MODAL_PLACEHOLDER-->
-
-    </div><!--SELL_MODAL_PLACEHOLDER-->
-  </div><!--SELL_MODAL_PLACEHOLDER-->
+    </div>
+  </div>
 
   <!-- SELL ASSET POPUP -->
   <div id="sellModal" class="modal">
